@@ -1,0 +1,13 @@
+Start this app with $ flask run (or by executing datingapp.py)
+
+Migration:
+Whenever you change the database schema (add/change a model in models.py), you can update the database with:
+$ flask db migrate : update new database schema
+$ flask db upgrade : upgrade to that schema you just created
+$ flask db downgrade : downgrade to previous version. you can delete the newest version file in migrations/versions
+to abandon the version you just downgraded from
+More info: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
+
+SQL alchemy tutorial:
+This website is very helpful:
+https://docs.sqlalchemy.org/en/20/core/constraints.html

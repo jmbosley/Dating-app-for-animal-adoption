@@ -1,0 +1,30 @@
+<!doctype html>
+<!--
+This is a container for website content. Anything you want to be on every page
+like the navigation bar goes here.
+The content of other pages is inserted into block content.
+-->
+<head>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% if title != None %}
+    <title>{{title}}</title>
+    {% else %}
+    <title>Title Placeholder</title>
+    {% endif %}
+</head>
+
+<body>
+    <header>
+        <h1>Dating App for Animal Adoption</h1> 
+    </header>
+
+    <nav>
+        <a href="/" >Home</a>
+    </nav>   
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
