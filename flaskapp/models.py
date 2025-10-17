@@ -1,5 +1,5 @@
 from flaskapp import db
-import sqlalchemy as sa # comes with types like String
+import sqlalchemy as sa  # comes with types like String
 from sqlalchemy.orm import Mapped, mapped_column # type hints
 
 
@@ -12,6 +12,6 @@ class publicAccount(db.Model):
     idPublicAccounts: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     firstName: Mapped[str] = mapped_column(sa.String(45))
     lastName: Mapped[str] = mapped_column(sa.String(45))
-    email: Mapped[str] = mapped_column(sa.String(45))
+    email: Mapped[str] = mapped_column(sa.String(45))  # can set unique=true later
     phoneNumber: Mapped[str] = mapped_column(sa.String(45))
     password: Mapped[str] = mapped_column(sa.String(45))

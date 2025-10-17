@@ -1,4 +1,8 @@
-Start this app with $ flask run (or by executing datingapp.py)
+Start this app with $ flask run (or by executing datingapp.py). .flaskenv will automatically load in FLASK_APP=datingapp.py
+Some notes:
+
+HTML base:
+You can write code you want to appear on every page into base.html.
 
 Migration:
 Whenever you change the database schema (add/change a model in models.py), you can update the database with:
@@ -6,8 +10,19 @@ $ flask db migrate : update new database schema
 $ flask db upgrade : upgrade to that schema you just created
 $ flask db downgrade : downgrade to previous version. you can delete the newest version file in migrations/versions
 to abandon the version you just downgraded from
-More info: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
+More info about migration and databases: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
+
+SQLite notes:
+SQLite is an SQL database contained in a file: flaskapp.db
+There are lots of online tools for viewing it.
 
 SQL alchemy tutorial:
-This website is very helpful:
+If you'd like to use it, this website is very helpful:
 https://docs.sqlalchemy.org/en/20/core/constraints.html
+It's just the standard mySQL stuff translated to Python.
+
+I created a brief demonstration of how the SQL code works in the /sqldemo route of main.py.
+
+Other helpful links:
+https://www.geeksforgeeks.org/python/sqlalchemy-orm-declaring-mapping/
+https://stackoverflow.com/questions/76498857/what-is-the-difference-between-mapped-column-and-column-in-sqlalchemy

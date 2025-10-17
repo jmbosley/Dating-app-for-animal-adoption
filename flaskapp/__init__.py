@@ -1,4 +1,4 @@
-# create package with __init__. tells datingapp.py how to run the app
+# create package with __init__: tells datingapp.py how to run the app
 from flask import Flask
 from config import Config
 
