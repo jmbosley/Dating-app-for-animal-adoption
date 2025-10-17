@@ -1,34 +1,42 @@
-import datetime
-
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from google.cloud import datastore
+from google.cloud.datastore.query import And, PropertyFilter
 
 app = Flask(__name__)
 datastore_client = datastore.Client()
 
-def store_time(dt):
-    entity = datastore.Entity(key=datastore_client.key("visit"))
-    entity.update({"timestamp": dt})
+ACCOUNTS = "accounts"
+MIN_ACCOUNT = ['firstName', 'lastName', 'email', 'phoneNumber', 'password']
 
-    datastore_client.put(entity)
-
-def fetch_times(limit):
-    query = datastore_client.query(kind="visit")
-    query.order = ["-timestamp"]
-
-    times = query.fetch(limit=limit)
-
-    return times
+# Error Message
+ERROR_MISSING_VALUE = "Not all required values were provided"
 
 @app.route("/")
 def root():
-    # Store the current access time in Datastore.
-    store_time(datetime.datetime.now(tz=datetime.timezone.utc))
+    return render_template("index.html")
 
-    # Fetch the most recent 10 access times from Datastore.
-    times = fetch_times(10)
+# Create a Public Account
+@app.route('/' + ACCOUNTS, methods=['POST'])
+def post_businesses():
+    # get account info
+    content = request.get_json()
 
-    return render_template("index.html", times=times)
+    # check if minimum info was provided
+    if not (set(MIN_ACCOUNT).issubset(content)):
+        return ERROR_MISSING_VALUE, 400
+    
+    # Create new Account
+    new_account = datastore.Entity(key=datastore_client.key(ACCOUNTS))
+    new_account.update({
+        'firstName': content['firstName'],
+        'lastName': content['lastName'],
+        'email': content['email'],
+        'phoneNumber': content['phoneNumber'],
+        'password': content['password']
+    })
+    datastore_client.put(new_account)
+    new_account['id'] = new_account.id
+    return ("Account was successfully created!", 201)
 
 if __name__ == "__main__":
     # This is used when running locally only. When deploying to Google App
