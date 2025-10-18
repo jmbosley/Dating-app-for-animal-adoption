@@ -4,14 +4,17 @@ from flaskapp import app # importing the flask app from our package defined in _
 from flaskapp import db
 from flaskapp.models import publicAccount
 import sqlalchemy as sa
-# datastore code:
-from google.cloud import datastore
-from google.cloud.datastore.query import And, PropertyFilter
-datastore_client = datastore.Client()
+# old datastore code:
+# from google.cloud import datastore
+# from google.cloud.datastore.query import And, PropertyFilter
+# datastore_client = datastore.Client()
 
 ACCOUNTS = "accounts"
 MIN_ACCOUNT = ['firstName', 'lastName', 'email', 'phoneNumber', 'password']
-ERROR_MISSING_VALUE = "Not all required values were provided"
+# Error Message
+#ERROR_MISSING_VALUE = "Not all required values were provided"
+
+example_SQL_account = publicAccount(firstName='Billy', lastName='Smith', email="fake@gmail.com", phoneNumber="123", password="password")
 
 
 @app.route("/")
@@ -20,20 +23,19 @@ def root():
 
 
 # sqllite demonstration using model
-# example_SQL_account = publicAccount(firstName='Billy', lastName='Smith', email="fake@gmail.com", phoneNumber="123", password="password")
 @app.route('/sqldemo', methods=['GET', 'POST'])
 def sql_demo():
     if request.method == 'GET': # display page
-        query = sa.select(publicAccount).where(publicAccount.phoneNumber != "5")  # random query
+        query = sa.select(publicAccount).where(publicAccount.phoneNumber != "5") # random query
         # https://docs.sqlalchemy.org/en/20/tutorial/data_select.html execute or scalars will work for this
         accounts = db.session.scalars(query)
-        return render_template("sqlexample.html", title="SQL example", result=accounts)
+        return render_template("sqlexample.html", title="SQL example", results=accounts)
 
     if request.method == 'POST': # add account
         content = request.get_json()
-        new_account = publicAccount(firstName=content['firstName'], lastName=content['lastName'], email=content['email'],
+        new_account = publicAccount(firstName=content['firstName'], lastName=content['lastName'], email=content['email'], 
                                     phoneNumber=content['phoneNumber'], password=content['password'])
-        db.session.add(new_account)  # INSERT
+        db.session.add(new_account) # INSERT
         db.session.commit()
         return redirect("/sqldemo")
 
@@ -47,7 +49,7 @@ def post_businesses():
     # check if minimum info was provided
     if not (set(MIN_ACCOUNT).issubset(content)):
         return ERROR_MISSING_VALUE, 400
-
+    
     # Create new Account
     new_account = datastore.Entity(key=datastore_client.key(ACCOUNTS))
     new_account.update({
