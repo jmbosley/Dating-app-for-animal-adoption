@@ -32,6 +32,192 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "200 Get Public Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test that the response status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test that the response body contains HTML content",
+							"pm.test(\"Response body contains HTML content\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"<!doctype html>\");",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"html\");",
+							"});",
+							"",
+							"// Test that the response time is less than 2000 ms",
+							"pm.test(\"Response time is less than 2000 ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{app_url}}/accounts/{{p_acc1}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"accounts",
+						"{{p_acc1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Delete Public Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204 (No Content)\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"pm.test(\"Response body is empty or null\", function () {",
+							"    var body = pm.response.text();",
+							"    pm.expect(body === \"\" || body === null).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{app_url}}/accounts/2",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"accounts",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Update Public Account",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"Waldo\",\r\n  \"lastName\": \"Butters\",\r\n  \"email\": \"jediofthecross@gmail.com\",\r\n  \"phoneNumber\": \"312-132-5231\",\r\n  \"password\": \"3213fdsfsd@\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/accounts/{{p_acc1}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"accounts",
+						"{{p_acc1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create Admin Account",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"Harry\",\r\n  \"lastName\": \"Dresden\",\r\n  \"email\": \"winterknight@gmail.com\",\r\n  \"phoneNumber\": \"312-906-6477\",\r\n  \"password\": \"fdsfs@#3@\"\r\n}"
+				},
+				"url": {
+					"raw": "{{app_url}}/administrator",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"administrator"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get Admin Account",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "204 Delete Admin Account",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "200 Update Admin Account",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"Waldo\",\r\n  \"lastName\": \"Butters\",\r\n  \"email\": \"jediofthecross@gmail.com\",\r\n  \"phoneNumber\": \"312-132-5231\",\r\n  \"password\": \"3213fdsfsd@\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/administrator/{{p_acc1}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"administrator",
+						"{{p_acc1}}"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
