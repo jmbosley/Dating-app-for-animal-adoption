@@ -15,3 +15,15 @@ class publicAccount(db.Model):
     email: Mapped[str] = mapped_column(sa.String(45))  # can set unique=true later
     phoneNumber: Mapped[str] = mapped_column(sa.String(45))
     password: Mapped[str] = mapped_column(sa.String(45))
+
+
+class adminAccount(db.Model):
+    __tablename__ = 'adminAccounts'
+    # attributeName: typehint = mapped_column(sql specifications)
+    idAdminAccounts: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    firstName: Mapped[str] = mapped_column(sa.String(45))
+    lastName: Mapped[str] = mapped_column(sa.String(45))
+    email: Mapped[str] = mapped_column(sa.String(45))  # can set unique=true later
+    phoneNumber: Mapped[str] = mapped_column(sa.String(45))
+    password: Mapped[str] = mapped_column(sa.String(45))
+
