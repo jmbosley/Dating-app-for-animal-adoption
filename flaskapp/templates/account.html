@@ -6,7 +6,8 @@
 
 	<h2>publicAccounts</h2>
 	{% for account in results %}
-	<p>object: {{ account}}    object name: {{ account.firstName }}</p>
+	{% set account = account['publicAccount'] %}
+	<p>object: {{ account }}     firstName:{{ account.firstName }}    </p>
 	{% endfor %}
 
 </body>

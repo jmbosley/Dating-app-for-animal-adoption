@@ -20,7 +20,11 @@
 <body>
   <h1>Animal Adoption Dating App</h1>
 
-	<h2>personal account page </h2>
+	<h2>adminAccounts</h2>
+	{% for account in results %}
+	{% set account = account['adminAccount'] %}
+	<p>object: {{ account }}     firstName:{{ account.firstName }}    </p>
+	{% endfor %}
 
 </body>
 {% endblock %}

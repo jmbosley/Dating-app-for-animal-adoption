@@ -1,6 +1,6 @@
 # routes
 from flask import Flask, render_template, request, redirect
-from flaskapp import app # importing the flask app from our package defined in __init__.py
+from flaskapp import app  # importing the flask app from our package defined in __init__.py
 from flaskapp import db
 from flaskapp.models import publicAccount, adminAccount
 import sqlalchemy as sa
@@ -40,9 +40,10 @@ def createPublicAccount():
         db.session.commit()
         return "Account was successfully created!", 201
 
-@app.route('/' + ACCOUNTS + '/<int:id>', methods=['GET', 'DELETE','PUT'])
+
+@app.route('/' + ACCOUNTS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
 def PublicAccountFunctions(id):
-    if request.method == 'GET': # display page
+    if request.method == 'GET':  # display page
         query = sa.select(publicAccount).where(publicAccount.idPublicAccounts == id)
         accounts = db.session.execute(query).mappings().all()
         if accounts is None:
@@ -58,7 +59,6 @@ def PublicAccountFunctions(id):
         if 'firstName' in content:
             query = sa.update(publicAccount).where(publicAccount.idPublicAccounts == id).values(firstName=content['firstName'])
             db.session.execute(query)
-            db.session.commit()
             db.session.commit()
         if 'lastName' in content:
             query = sa.update(publicAccount).where(publicAccount.idPublicAccounts == id).values(lastName=content['lastName'])
@@ -100,7 +100,7 @@ def createAdminAccount():
     
 @app.route('/' + ADMINS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
 def AdminAccountFunctions(id):
-    if request.method == 'GET': # display page
+    if request.method == 'GET':  # display page
         query = sa.select(adminAccount).where(adminAccount.idAdminAccounts == id)
         accounts = db.session.execute(query).mappings().all()
         if accounts is None:
@@ -116,7 +116,6 @@ def AdminAccountFunctions(id):
         if 'firstName' in content:
             query = sa.update(adminAccount).where(adminAccount.idAdminAccounts == id).values(firstName=content['firstName'])
             db.session.execute(query)
-            db.session.commit()
             db.session.commit()
         if 'lastName' in content:
             query = sa.update(adminAccount).where(adminAccount.idAdminAccounts == id).values(lastName=content['lastName'])
