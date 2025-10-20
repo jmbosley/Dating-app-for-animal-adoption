@@ -1,6 +1,9 @@
 Start this app with $ flask run (or by executing datingapp.py). .flaskenv will automatically load in FLASK_APP=datingapp.py
 Some notes:
 
+Our Postman testing link (max 3 people):
+https://app.getpostman.com/join-team?invite_code=31a5c3bc8febcf368b6d19faad5f9ce09a20c8ba69423e637f257f14013367e9&target_code=c2b3b967aef6cd83ace63dd0297d041c
+
 HTML base:
 You can write code you want to appear on every page into base.html.
 
@@ -12,6 +15,10 @@ $ flask db downgrade : downgrade to previous version. you can delete the newest 
 to abandon the version you just downgraded from
 More info about migration and databases: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
 
+You can also delete the .db file and migrations folder to completely start over. After you've done this, run:
+$ flask db init
+and then the migrate, upgrade commands again.
+
 SQLite notes:
 SQLite is an SQL database contained in a file: flaskapp.db
 There are lots of online tools for viewing it.
@@ -21,6 +28,8 @@ https://www.youtube.com/watch?v=fmq6-wvbxyA
 SQL alchemy tutorial:
 If you'd like to use it, this website is very helpful:
 https://docs.sqlalchemy.org/en/20/core/constraints.html
+SQL Datatype Objects:
+https://docs.sqlalchemy.org/en/20/core/types.html
 It's just the standard mySQL stuff translated to Python.
 
 I created a brief demonstration of how the SQL code works in the /sqldemo route of main.py.
