@@ -27,3 +27,15 @@ class adminAccount(db.Model):
     phoneNumber: Mapped[str] = mapped_column(sa.String(45))
     password: Mapped[str] = mapped_column(sa.String(45))
 
+
+class animal(db.Model):
+    __tablename__ = 'animals'
+    # attributeName: typehint = mapped_column(sql specifications)
+    idAnimals: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(sa.String(45))
+    type: Mapped[str] = mapped_column(sa.String(45))
+    breed: Mapped[str] = mapped_column(sa.String(45), nullable = True) # no default specified: default NULL
+    disposition: Mapped[str] = mapped_column(sa.String(45), nullable = True)
+    availability: Mapped[bool] = mapped_column(default=True)
+    description: Mapped[str] = mapped_column(sa.String(300), default='')
+    numImages: Mapped[int] = mapped_column(default = 0) # image naming convention: petImg_{id}_{imageNum}.jpg

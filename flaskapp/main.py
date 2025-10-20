@@ -2,7 +2,7 @@
 from flask import Flask, render_template, request, redirect
 from flaskapp import app  # importing the flask app from our package defined in __init__.py
 from flaskapp import db
-from flaskapp.models import publicAccount, adminAccount
+from flaskapp.models import publicAccount, adminAccount, animal
 import sqlalchemy as sa
 # old datastore code:
 # from google.cloud import datastore
@@ -11,10 +11,13 @@ import sqlalchemy as sa
 
 ACCOUNTS = "accounts"
 ADMINS = "administrator"
+ANIMALS = "animals"
 MIN_ACCOUNT = ['firstName', 'lastName', 'email', 'phoneNumber', 'password']
 # Error Message
+MIN_ANIMAL = ['name', 'type'] # optional or defaulted: breed, disposition, availability, description, numImages
 ERROR_MISSING_VALUE = "Not all required values were provided"
 ERROR_NOT_FOUND_ACC = "The requested account was not found"
+ERROR_NOT_FOUND_ANIMAL = "The requested animal was not found"
 
 
 @app.route("/")
@@ -86,7 +89,7 @@ def PublicAccountFunctions(id):
 def createAdminAccount():
     if request.method == 'POST':  # add account
         content = request.get_json()
-        # check  if minimum info was provided
+        # check if minimum info was provided
         if not (set(MIN_ACCOUNT).issubset(content)):
             return ERROR_MISSING_VALUE, 400
         new_account = adminAccount(firstName=content['firstName'],
@@ -135,3 +138,70 @@ def AdminAccountFunctions(id):
             db.session.commit()
         return "Account was successfully updated!", 201
         
+
+# -------------------------------------------------------- Animal
+
+# Create Animal Account
+@app.route('/' + ANIMALS, methods=['POST'])
+def createAnimalAccount():
+    if request.method == 'POST':  # add account
+        content = request.get_json()
+        # check if minimum info was provided
+        if not (set(MIN_ANIMAL).issubset(content)):
+            return ERROR_MISSING_VALUE, 400
+        new_animal = animal(name=content.get('name'),  # .get() prevents KeyError for nullables
+                            type=content.get('type'),
+                            breed=content.get('breed'),
+                            disposition=content.get('disposition'),
+                            availability=content.get('availability'),
+                            description=content.get('description'),
+                            numImages=content.get('numImages')
+                            )
+        db.session.add(new_animal)  # INSERT
+        db.session.commit()
+        return "Animal was successfully created!", 201
+    
+@app.route('/' + ANIMALS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
+def animalFunctions(id):
+    if request.method == 'GET':  # display page
+        query = sa.select(animal).where(animal.idAnimals == id)
+        animals = db.session.execute(query).mappings().all()
+        if animals is None:
+            return ERROR_NOT_FOUND_ANIMAL, 404
+        return render_template("animal.html", title="Animals", results=animals), 200
+    if request.method == 'DELETE':
+        query = sa.delete(animal).where(animal.idAnimals == id)
+        db.session.execute(query)
+        db.session.commit()
+        return ('', 204)
+    if request.method == 'PUT':
+        content = request.get_json()
+        if 'name' in content:
+            query = sa.update(animal).where(animal.idAnimals == id).values(name=content['name'])
+            db.session.execute(query)
+            db.session.commit()
+        if 'type' in content:
+            query = sa.update(animal).where(animal.idAnimals == id).values(type=content['type'])
+            db.session.execute(query)
+            db.session.commit()
+        if 'breed' in content:
+            query = sa.update(animal).where(animal.idAnimals == id).values(breed=content['breed'])
+            db.session.execute(query)
+            db.session.commit()
+        if 'disposition' in content:
+            query = sa.update(animal).where(animal.idAnimals == id).values(disposition=content['disposition'])
+            db.session.execute(query)
+            db.session.commit()
+        if 'availability' in content:
+            query = sa.update(animal).where(animal.idAnimals == id).values(availability=content['availability'])
+            db.session.execute(query)
+            db.session.commit()
+        if 'description' in content:
+            query = sa.update(animal).where(animal.idAnimals == id).values(description=content['description'])
+            db.session.execute(query)
+            db.session.commit()
+        if 'numImages' in content:
+            query = sa.update(animal).where(animal.idAnimals == id).values(numImages=content['numImages'])
+            db.session.execute(query)
+            db.session.commit()
+        return "Animal was successfully updated!", 201

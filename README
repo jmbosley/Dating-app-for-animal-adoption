@@ -15,6 +15,8 @@ More info about migration and databases: https://blog.miguelgrinberg.com/post/th
 SQLite notes:
 SQLite is an SQL database contained in a file: flaskapp.db
 There are lots of online tools for viewing it.
+I'm currently using DBeaver to view the database while debugging. Not sure if that's the best option.
+https://www.youtube.com/watch?v=fmq6-wvbxyA
 
 SQL alchemy tutorial:
 If you'd like to use it, this website is very helpful:
