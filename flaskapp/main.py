@@ -4,10 +4,6 @@ from flaskapp import app  # importing the flask app from our package defined in 
 from flaskapp import db
 from flaskapp.models import publicAccount, adminAccount, animal, newsPost
 import sqlalchemy as sa
-# old datastore code:
-# from google.cloud import datastore
-# from google.cloud.datastore.query import And, PropertyFilter
-# datastore_client = datastore.Client()
 
 ACCOUNTS = "accounts"
 ADMINS = "administrator"
@@ -34,7 +30,7 @@ def root():
 def createPublicAccount():
     if request.method == 'POST': # add account
         content = request.get_json()
-        # check  if minimum info was provided
+        # check if minimum info was provided
         if not (set(MIN_ACCOUNT).issubset(content)):
             return ERROR_MISSING_VALUE, 400
         new_account = publicAccount(firstName=content.get('firstName'),  # .get() prevents KeyError for nullables
@@ -104,6 +100,7 @@ def createAdminAccount():
         db.session.commit()
         return "Account was successfully created!", 201
     
+
 @app.route('/' + ADMINS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
 def AdminAccountFunctions(id):
     if request.method == 'GET':  # display page
@@ -165,6 +162,7 @@ def createAnimal():
         db.session.commit()
         return "Animal was successfully created!", 201
     
+
 @app.route('/' + ANIMALS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
 def animalFunctions(id):
     if request.method == 'GET':  # display page
@@ -232,7 +230,8 @@ def createNewsPost():
         db.session.add(new_newsPost)  # INSERT
         db.session.commit()
         return "News post was successfully created!", 201
-    
+
+
 @app.route('/' + NEWSPOSTS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
 def newsPostFunctions(id):
     if request.method == 'GET':  # display page

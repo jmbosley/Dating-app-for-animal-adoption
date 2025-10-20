@@ -42,6 +42,7 @@ class animal(db.Model):
     description: Mapped[str] = mapped_column(sa.String(300), default='')
     numImages: Mapped[int] = mapped_column(default = 0) # image naming convention: petImg_{id}_{imageNum}.jpg
 
+
 class newsPost(db.Model):
     __tablename__ = 'newsPost'
     # attributeName: typehint = mapped_column(sql specifications)
