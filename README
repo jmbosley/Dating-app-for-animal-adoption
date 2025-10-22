@@ -37,3 +37,19 @@ I created a brief demonstration of how the SQL code works in the /sqldemo route 
 Other helpful links:
 https://www.geeksforgeeks.org/python/sqlalchemy-orm-declaring-mapping/
 https://stackoverflow.com/questions/76498857/what-is-the-difference-between-mapped-column-and-column-in-sqlalchemy
+
+Another Flask guide:
+https://www.youtube.com/watch?v=MwZwr5Tvyxo&list=PL-osiE80TeTs4UjLw5MM6OjgkjFeUxCYH&index=1
+
+
+Citations
+
+Citation for flaskapp:
+Date: 10/21/2025
+The general layout of this app and database (package structure with models and forms) is inspired by Migel Grinberg's Flask mega tutorial.
+Source URL: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
+
+Citation for models.py:
+Date: 10/21/2025
+The use and format of SQLalchemy in models.py is partly guided by Ian Wilson's comment.
+Source URL: https://stackoverflow.com/a/76499049
