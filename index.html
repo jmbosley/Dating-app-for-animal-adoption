@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Adoption Dating Site</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>Animal Adoption Dating Site</h1>
+            </div>
+            <nav class="nav-menu">
+                <!-- TODO: Replace these hrefs with actual login and create account page URLs -->
+                <a href="/login" class="btn btn-secondary">Log In</a>
+                <a href="/create-account" class="btn btn-primary">Create Account</a>
+            </nav>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2 class="hero-title">Find Your Perfect Pet/Companion</h2>
+                <p class="hero-subtitle">Browse through shelter animals looking for their forever home!</p>
+                <div class="hero-actions">
+                    <!-- TODO: Replace href with actual create account page URL -->
+
+                    <a href="#about" class="btn btn-secondary btn-large">Tell Me More</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="placeholder-image">
+                    <!-- TODO: Replace static image with actual featured animal image from database -->
+                    <!-- Example: <img src="{{featured_animal.picture_url}}" alt="Featured pet"> -->
+                    <img src="/static/featured-animal-image" alt="Featured adoptable pet" class="featured-pet-image-hero">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--  about -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">About Our Site</h2>
+            <div class="about-content">
+                <p>This Animal Adoption Dating Site aims to streamline the process of connecting prospective adopters with suitable animals. It will provide clear and comprehensive information, including disposition, availability, breed, and other relevant details, to ensure all important factors are considered prior to adoption. This benefits both the users and the animals.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features  -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-image">
+                        <!-- TODO: replace with actual icon/image -->
+                        <img src="/static/images/puppies.jpg" alt="Browse" class="featured-pet-image-about">
+                    </div>
+                    <h3>Browse Profiles</h3>
+                    <p>Search through pictures and profiles of animals available for adoption</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-image">
+                        <!-- TODO: replace with actual icon/image -->
+                        <img src="/static/images/kittens.jpg" alt="Filter" class="featured-pet-image-about">
+                    </div>
+                    <h3>Find Your Match</h3>
+                    <p>Filter by breed, disposition, time in shelter, lifestyle compatibility, we have it all!</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-image">
+                        <!-- TODO: replace with actual icon/image -->
+                        <img src="/static/images/babychicks.jpg" alt="Connect" class="featured-pet-image-about">
+                    </div>
+                    <h3>Adopt with Confidence</h3>
+                    <p>Get all the information you need to make the perfect match. Then connect with the animal shelter to meet your new companion!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Feed -->
+    <section class="news-feed">
+        <div class="container">
+            <h2 class="section-title">Latest News + Updates</h2>
+            <div id="newsContainer" class="news-grid">
+                <!-- news items to be dynamically loaded here -->
+
+                <div class="loading">Loading ...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Animal Adoption Dating Site. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
