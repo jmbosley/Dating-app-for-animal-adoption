@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "972f5edd-b15c-4e84-802d-cf29dd8b5d85",
+		"_postman_id": "1371500a-2ffb-4354-88fd-9e3aa1bf6dfb",
 		"name": "Test Backend",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "49181393",
-		"_collection_link": "https://jmbosley-4433010.postman.co/workspace/Julie-Bosley's-Workspace~56d1750a-e55b-4792-8ff2-0814dca04f2e/collection/49181393-972f5edd-b15c-4e84-802d-cf29dd8b5d85?action=share&source=collection_link&creator=49181393"
+		"_exporter_id": "49343329",
+		"_collection_link": "https://connelan-5121933.postman.co/workspace/Animal-Adoption-App~5c6d447d-6276-4be6-845a-8b9665ca2166/collection/49343329-1371500a-2ffb-4354-88fd-9e3aa1bf6dfb?action=share&source=collection_link&creator=49343329"
 	},
 	"item": [
 		{
@@ -116,13 +116,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{app_url}}/accounts/2",
+					"raw": "{{app_url}}/accounts/1",
 					"host": [
 						"{{app_url}}"
 					],
 					"path": [
 						"accounts",
-						"2"
+						"1"
 					]
 				}
 			},
@@ -162,7 +162,12 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"firstName\": \"Harry\",\r\n  \"lastName\": \"Dresden\",\r\n  \"email\": \"winterknight@gmail.com\",\r\n  \"phoneNumber\": \"312-906-6477\",\r\n  \"password\": \"fdsfs@#3@\"\r\n}"
+					"raw": "{\r\n  \"firstName\": \"Bobby\",\r\n  \"lastName\": \"Dresden\",\r\n  \"email\": \"winterknight@gmail.com\",\r\n  \"phoneNumber\": \"312-906-6477\",\r\n  \"password\": \"fdsfs@#3@\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
 				},
 				"url": {
 					"raw": "{{app_url}}/administrator",
@@ -180,7 +185,17 @@
 			"name": "200 Get Admin Account",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/administrator/{{a_acc1}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"administrator",
+						"{{a_acc1}}"
+					]
+				}
 			},
 			"response": []
 		},
@@ -188,7 +203,10 @@
 			"name": "204 Delete Admin Account",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": ""
+				}
 			},
 			"response": []
 		},
@@ -207,13 +225,265 @@
 					}
 				},
 				"url": {
-					"raw": "{{app_url}}/administrator/{{p_acc1}}",
+					"raw": "{{app_url}}/administrator/{{a_acc1}}",
 					"host": [
 						"{{app_url}}"
 					],
 					"path": [
 						"administrator",
-						"{{p_acc1}}"
+						"{{a_acc1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create Animal",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Fluffy\",\r\n  \"type\": \"Cat\",\r\n  \"breed\": \"Siamese\",\r\n  \"disposition\": \"Evil\",\r\n  \"availability\": true,\r\n  \"description\": \"Likes fish\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/animals",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"animals"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create Animal Minimum",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Wiggles\",\r\n  \"type\": \"Ferret\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/animals",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"animals"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get Animal",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/animals/{{a_acc1}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"animals",
+						"{{a_acc1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Delete Animal",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204 (No Content)\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"pm.test(\"Response body is empty or null\", function () {",
+							"    var body = pm.response.text();",
+							"    pm.expect(body === \"\" || body === null).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{app_url}}/accounts/1",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"accounts",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Update Animal",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Robert\",\r\n  \"type\": \"Dog\",\r\n  \"breed\": \"Daschund\",\r\n  \"disposition\": \"Cuddly\",\r\n  \"availability\": false,\r\n  \"description\": \"Sausage\",\r\n  \"numImages\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/animals/{{a_acc1}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"animals",
+						"{{a_acc1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create News Post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"News\",\r\n  \"body\": \"Adopt a cat today\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/newsPosts",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"newsPosts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get News Post",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/newsPosts/{{news_post1}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"newsPosts",
+						"{{news_post1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Delete News Post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204 (No Content)\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"pm.test(\"Response body is empty or null\", function () {",
+							"    var body = pm.response.text();",
+							"    pm.expect(body === \"\" || body === null).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{app_url}}/accounts/1",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"accounts",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Update News Post",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Blog\",\r\n  \"body\": \"Adopt a dog tomorrow\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/newsPosts/{{a_acc1}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"newsPosts",
+						"{{a_acc1}}"
 					]
 				}
 			},

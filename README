@@ -1,6 +1,9 @@
 Start this app with $ flask run (or by executing datingapp.py). .flaskenv will automatically load in FLASK_APP=datingapp.py
 Some notes:
 
+Our Postman testing link (max 3 people):
+https://app.getpostman.com/join-team?invite_code=31a5c3bc8febcf368b6d19faad5f9ce09a20c8ba69423e637f257f14013367e9&target_code=c2b3b967aef6cd83ace63dd0297d041c
+
 HTML base:
 You can write code you want to appear on every page into base.html.
 
@@ -12,13 +15,21 @@ $ flask db downgrade : downgrade to previous version. you can delete the newest 
 to abandon the version you just downgraded from
 More info about migration and databases: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
 
+You can also delete the .db file and migrations folder to completely start over. After you've done this, run:
+$ flask db init
+and then the migrate, upgrade commands again.
+
 SQLite notes:
 SQLite is an SQL database contained in a file: flaskapp.db
 There are lots of online tools for viewing it.
+I'm currently using DBeaver to view the database while debugging. Not sure if that's the best option.
+https://www.youtube.com/watch?v=fmq6-wvbxyA
 
 SQL alchemy tutorial:
 If you'd like to use it, this website is very helpful:
 https://docs.sqlalchemy.org/en/20/core/constraints.html
+SQL Datatype Objects:
+https://docs.sqlalchemy.org/en/20/core/types.html
 It's just the standard mySQL stuff translated to Python.
 
 I created a brief demonstration of how the SQL code works in the /sqldemo route of main.py.
@@ -26,3 +37,19 @@ I created a brief demonstration of how the SQL code works in the /sqldemo route 
 Other helpful links:
 https://www.geeksforgeeks.org/python/sqlalchemy-orm-declaring-mapping/
 https://stackoverflow.com/questions/76498857/what-is-the-difference-between-mapped-column-and-column-in-sqlalchemy
+
+Another Flask guide:
+https://www.youtube.com/watch?v=MwZwr5Tvyxo&list=PL-osiE80TeTs4UjLw5MM6OjgkjFeUxCYH&index=1
+
+
+Citations
+
+Citation for flaskapp:
+Date: 10/21/2025
+The general layout of this app and database (package structure with models and forms) is inspired by Migel Grinberg's Flask mega tutorial.
+Source URL: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
+
+Citation for models.py:
+Date: 10/21/2025
+The use and format of SQLalchemy in models.py is partly guided by Ian Wilson's comment.
+Source URL: https://stackoverflow.com/a/76499049

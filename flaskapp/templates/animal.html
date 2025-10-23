@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<body>
+
+	<h2>Animals</h2>
+	{% for animal in results %}
+	{% set animal = animal['animal'] %}
+	<p>object: {{ animal }}     firstName:{{ animal.name }}    </p>
+	{% endfor %}
+
+</body>
+{% endblock %}
