@@ -11,8 +11,8 @@ ADMINS = "administrator"
 ANIMALS = "animals"
 NEWSPOSTS = "newsPosts"
 MIN_ACCOUNT = ['firstName', 'lastName', 'email', 'password']  # optional: phoneNumber
-MIN_ANIMAL = ['name', 'type']  # optional or defaulted: breed, disposition, availability, description, numImages
-MIN_NEWSPOST = ['title', 'body']  # defaulted: datePublished
+MIN_ANIMAL = ['name', 'type', 'children', 'dogs', 'cats']  # optional or defaulted: breed, disposition, availability, description, numImages
+MIN_NEWSPOST = ['title', 'body', 'idAnimals']  # defaulted: datePublished
 # errors
 ERROR_MISSING_VALUE = "Not all required values were provided"
 ERROR_NOT_FOUND_ACC = "The requested account was not found"
@@ -20,6 +20,19 @@ ERROR_NOT_FOUND_ANIMAL = "The requested animal was not found"
 ERROR_NOT_FOUND_NEWSPOST = "The requested news post was not found"
 
 
+@app.route("/relationshipdemo" + '/<int:id>')
+def relationshipDemo(id):
+    # publicaccounts and animals
+    query = sa.select(publicAccount).where(publicAccount.idPublicAccounts == id)
+    curr_account = db.session.execute(query).mappings().all()[0]["publicAccount"]
+    query = curr_account.animals.select() # get all animals that have publicAccount as a foreign key
+    animals = db.session.execute(query).mappings().all()
+
+    query = sa.select(animal).where(animal.idAnimals == id)
+    curr_animal = db.session.execute(query).mappings().all()[0]["animal"]
+    account = curr_animal.publicAccount
+
+    return render_template("relationship.html", animals=animals, account=account, title="Relationships"), 200
 
 
 @app.route("/")
@@ -140,7 +153,7 @@ def AdminAccountFunctions(id):
             db.session.execute(query)
             db.session.commit()
         return "Account was successfully updated!", 201
-        
+
 
 # -------------------------------------------------------- Animal
 
@@ -156,11 +169,24 @@ def createAnimal():
                             birthday=content.get('birthday'),
                             type=content.get('type'),
                             breed=content.get('breed'),
-                            disposition=content.get('disposition'),
                             availability=content.get('availability'),
                             description=content.get('description'),
-                            numImages=content.get('numImages')
+                            numImages=content.get('numImages'),
+                            children=content.get('children'),
+                            dogs=content.get('dogs'),
+                            cats=content.get('cats'),
+                            idPublicAccounts=content.get('idPublicAccounts')
                             )
+        
+        if content.get('idPublicAccounts') is not None:
+            # check if animal exists
+            query = sa.select(publicAccount).where(publicAccount.idPublicAccounts == content.get('idPublicAccounts'))
+            related_acc = db.session.execute(query).mappings().all()
+            if not related_acc:  # query returned empty list
+                return ERROR_NOT_FOUND_ACC, 400
+            # account exists, set relationship
+            # new_animal.publicAccount = related_acc[0]['publicAccount']
+        
         db.session.add(new_animal)  # INSERT
         db.session.commit()
         return "Animal was successfully created!", 201
@@ -183,6 +209,13 @@ def animalFunctions(id):
 
     if request.method == 'PUT':
         content = request.get_json()
+        if content.get("idPublicAccounts", "") != "":
+            # check if publicAccount exists
+            query = sa.select(publicAccount).where(publicAccount.idPublicAccounts == content.get('idPublicAccounts'))
+            related_acc = db.session.execute(query).mappings().all()
+            if not related_acc:
+                return ERROR_NOT_FOUND_ACC, 400
+
         # https://docs.sqlalchemy.org/en/20/orm/mapping_styles.html#orm-mapper-inspection-mapper
         # https://docs.sqlalchemy.org/en/20/core/dml.html
         table_columns = inspect(animal).columns  # get every type of column from model
@@ -205,10 +238,27 @@ def createNewsPost():
         # check if minimum info was provided
         if not (set(MIN_NEWSPOST).issubset(content)):
             return ERROR_MISSING_VALUE, 400
+
         new_newsPost = newsPost(title=content.get('title'),
                                 body=content.get('body'),
-                                datePublished=content.get('datePublished')
+                                datePublished=content.get('datePublished'),
+                                idAnimals=content.get('idAnimals')
                                 )
+        
+        if content.get('idAnimals') is not None:
+            # check if animal exists
+            query = sa.select(animal).where(animal.idAnimals == content.get('idAnimals'))
+            related_animal = db.session.execute(query).mappings().all()
+            if not related_animal:  # query returned empty list
+                return ERROR_NOT_FOUND_ANIMAL, 400
+            # animal exists, set relationship
+            # new_newsPost.animal = related_animal[0]['animal']
+            debug_animal = related_animal[0]['animal']
+            print(debug_animal.newsPosts)
+            query = debug_animal.newsPosts.select()
+            posts = db.session.execute(query).mappings().all().values()
+            print(posts)
+
         db.session.add(new_newsPost)  # INSERT
         db.session.commit()
         return "News post was successfully created!", 201
@@ -231,11 +281,18 @@ def newsPostFunctions(id):
 
     if request.method == 'PUT':
         content = request.get_json()
+        if content.get("idAnimals", "") != "":
+            # check if animal exists
+            query = sa.select(animal).where(animal.idAnimals == content.get('idAnimals'))
+            related_animal = db.session.execute(query).mappings().all()
+            if not related_animal:
+                return ERROR_NOT_FOUND_ANIMAL, 400
 
         table_columns = inspect(newsPost).columns
         for column in table_columns:
             if content.get(column.name, "") != "":
                 query = sa.update(newsPost).where(newsPost.idNewsPosts == id).values({column.name: content[column.name]})
+  
                 db.session.execute(query)
                 db.session.commit()
 
