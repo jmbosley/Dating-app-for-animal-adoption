@@ -1,9 +1,10 @@
 # routes
-from flask import Flask, render_template, request, redirect
+from flask import render_template, request, redirect
 from flaskapp import app  # importing the flask app from our package defined in __init__.py
 from flaskapp import db
 from flaskapp.models import publicAccount, adminAccount, animal, newsPost
 import sqlalchemy as sa
+from sqlalchemy import inspect
 
 ACCOUNTS = "accounts"
 ADMINS = "administrator"
@@ -17,6 +18,8 @@ ERROR_MISSING_VALUE = "Not all required values were provided"
 ERROR_NOT_FOUND_ACC = "The requested account was not found"
 ERROR_NOT_FOUND_ANIMAL = "The requested animal was not found"
 ERROR_NOT_FOUND_NEWSPOST = "The requested news post was not found"
+
+
 
 
 @app.route("/")
@@ -99,7 +102,7 @@ def createAdminAccount():
         db.session.add(new_account)  # INSERT
         db.session.commit()
         return "Account was successfully created!", 201
-    
+
 
 @app.route('/' + ADMINS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
 def AdminAccountFunctions(id):
@@ -161,7 +164,7 @@ def createAnimal():
         db.session.add(new_animal)  # INSERT
         db.session.commit()
         return "Animal was successfully created!", 201
-    
+
 
 @app.route('/' + ANIMALS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
 def animalFunctions(id):
@@ -171,45 +174,24 @@ def animalFunctions(id):
         if animals is None:
             return ERROR_NOT_FOUND_ANIMAL, 404
         return render_template("animal.html", title="Animals", results=animals), 200
+
     if request.method == 'DELETE':
         query = sa.delete(animal).where(animal.idAnimals == id)
         db.session.execute(query)
         db.session.commit()
         return ('', 204)
+
     if request.method == 'PUT':
         content = request.get_json()
-        if 'name' in content:
-            query = sa.update(animal).where(animal.idAnimals == id).values(name=content['name'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'birthday' in content:
-            query = sa.update(animal).where(animal.idAnimals == id).values(birthday=content['birthday'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'type' in content:
-            query = sa.update(animal).where(animal.idAnimals == id).values(type=content['type'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'breed' in content:
-            query = sa.update(animal).where(animal.idAnimals == id).values(breed=content['breed'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'disposition' in content:
-            query = sa.update(animal).where(animal.idAnimals == id).values(disposition=content['disposition'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'availability' in content:
-            query = sa.update(animal).where(animal.idAnimals == id).values(availability=content['availability'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'description' in content:
-            query = sa.update(animal).where(animal.idAnimals == id).values(description=content['description'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'numImages' in content:
-            query = sa.update(animal).where(animal.idAnimals == id).values(numImages=content['numImages'])
-            db.session.execute(query)
-            db.session.commit()
+        # https://docs.sqlalchemy.org/en/20/orm/mapping_styles.html#orm-mapper-inspection-mapper
+        # https://docs.sqlalchemy.org/en/20/core/dml.html
+        table_columns = inspect(animal).columns  # get every type of column from model
+        for column in table_columns:
+            if content.get(column.name, "") != "":
+                query = sa.update(animal).where(animal.idAnimals == id).values({column.name: content[column.name]})
+                db.session.execute(query)
+                db.session.commit()
+
         return "Animal was successfully updated!", 201
 
 
@@ -240,23 +222,21 @@ def newsPostFunctions(id):
         if newsPosts is None:
             return ERROR_NOT_FOUND_NEWSPOST, 404
         return render_template("newsPost.html", title="newsPosts", results=newsPosts), 200
+
     if request.method == 'DELETE':
         query = sa.delete(newsPost).where(newsPost.idNewsPosts == id)
         db.session.execute(query)
         db.session.commit()
         return ('', 204)
+
     if request.method == 'PUT':
         content = request.get_json()
-        if 'title' in content:
-            query = sa.update(newsPost).where(newsPost.idNewsPosts == id).values(title=content['title'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'body' in content:
-            query = sa.update(newsPost).where(newsPost.idNewsPosts == id).values(body=content['body'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'datePublished' in content:
-            query = sa.update(newsPost).where(newsPost.idNewsPosts == id).values(datePublished=content['datePublished'])
-            db.session.execute(query)
-            db.session.commit()
+
+        table_columns = inspect(newsPost).columns
+        for column in table_columns:
+            if content.get(column.name, "") != "":
+                query = sa.update(newsPost).where(newsPost.idNewsPosts == id).values({column.name: content[column.name]})
+                db.session.execute(query)
+                db.session.commit()
+
         return "News post was successfully updated!", 201
