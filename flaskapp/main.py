@@ -51,21 +51,6 @@ def updateEntity(model_type, content, id):
             db.session.commit()
 
 
-@app.route("/relationshipdemo" + '/<int:id>')
-def relationshipDemo(id):
-    # publicaccounts and animals
-    query = sa.select(publicAccount).where(publicAccount.id == id)
-    curr_account = db.session.execute(query).mappings().all()[0]["publicAccount"]
-    query = curr_account.animals.select() # get all animals that have publicAccount as a foreign key
-    animals = db.session.execute(query).mappings().all()
-
-    query = sa.select(animal).where(animal.id == id)
-    curr_animal = db.session.execute(query).mappings().all()[0]["animal"]
-    account = curr_animal.publicAccount
-
-    return render_template("relationship.html", animals=animals, account=account, title="Relationships"), 200
-
-
 @app.route("/")
 def root():
     return render_template("index.html", title="Front end not yet implemented")
