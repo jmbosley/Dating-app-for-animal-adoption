@@ -26,7 +26,7 @@ ERROR_NOT_FOUND_NEWSPOST = "The requested news post was not found"
 
 def entityExists(model_type, id):
     """
-    Takes model_type, content, and id. Returns True if an entity with that id is found.
+    Takes model_type and id. Returns True if an entity with that id is found.
     """
     query = sa.select(model_type).where(model_type.id == id)
     entity = db.session.execute(query).mappings().all()
@@ -241,12 +241,12 @@ def createAnimal():
                             cats=content.get('cats'),
                             idPublicAccount=content.get('idPublicAccount')
                             )
-        
+
         # check if publicAccount exists. probably won't be provided during creation
         if content.get('idPublicAccount') is not None:
             if entityExists(publicAccount, content.get('idPublicAccount')) is False:
                 return ERROR_NOT_FOUND_ACC, 400
-        
+
         # add now because we need the primary key for image naming
         db.session.add(new_animal)  # INSERT
         db.session.commit()
