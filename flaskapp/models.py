@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, WriteOnlyMapped, mapped_column, relationship
 class publicAccount(db.Model):
     __tablename__ = 'publicAccounts'
     # attributeName: typehint = mapped_column(sql specifications)
-    idPublicAccounts: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     firstName: Mapped[str] = mapped_column(sa.String(45))
     lastName: Mapped[str] = mapped_column(sa.String(45))
     email: Mapped[str] = mapped_column(sa.String(45))  # can set unique=true later (off for easier debugging)
@@ -23,7 +23,7 @@ class publicAccount(db.Model):
 
 class adminAccount(db.Model):
     __tablename__ = 'adminAccounts'
-    idAdminAccounts: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     firstName: Mapped[str] = mapped_column(sa.String(45))
     lastName: Mapped[str] = mapped_column(sa.String(45))
     email: Mapped[str] = mapped_column(sa.String(45))  # unique = true
@@ -33,20 +33,20 @@ class adminAccount(db.Model):
 
 class animal(db.Model):
     __tablename__ = 'animals'
-    idAnimals: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(sa.String(45))
     birthday: Mapped[date]  = mapped_column(index=True, nullable=True)  # index for sorting purposes
     type: Mapped[str] = mapped_column(sa.String(45))
     breed: Mapped[str] = mapped_column(sa.String(45), nullable=True)
     availability: Mapped[bool] = mapped_column(default=True)
     description: Mapped[str] = mapped_column(sa.String(300), default='')
-    numImages: Mapped[int] = mapped_column(default=0)  # image naming convention: petimg_{id}_{num <= numImages}.jpg
+    numImages: Mapped[int] = mapped_column(default=0)  # image naming convention: animalImg_{id}_{num <= numImages}.jpg
     # disposition: friendly with who?
     children: Mapped[bool] = mapped_column()
     dogs: Mapped[bool] = mapped_column()
     cats: Mapped[bool] = mapped_column()
 
-    idPublicAccounts: Mapped[int] = mapped_column(sa.ForeignKey(publicAccount.idPublicAccounts), index=True, nullable=True)
+    idPublicAccount: Mapped[int] = mapped_column(sa.ForeignKey(publicAccount.id), index=True, nullable=True)
 
     newsPosts: WriteOnlyMapped['newsPost'] = relationship(back_populates='animal')
 
@@ -56,12 +56,12 @@ class animal(db.Model):
 
 class newsPost(db.Model):
     __tablename__ = 'newsPosts'
-    idNewsPosts: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(sa.String(100))
     body: Mapped[str] = mapped_column(sa.String(10000))
     datePublished: Mapped[date] = mapped_column(default=date.today(), index=True)
 
-    idAnimals: Mapped[int] = mapped_column(sa.ForeignKey(animal.idAnimals), index=True, nullable=True)
+    idAnimal: Mapped[int] = mapped_column(sa.ForeignKey(animal.id), index=True, nullable=True)
 
     # directly access related animal objects with newsPost.animal instead of selecting them with foreign id
     animal: Mapped['animal'] = relationship(back_populates='newsPosts')

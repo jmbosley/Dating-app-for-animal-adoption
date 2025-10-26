@@ -48,15 +48,21 @@ Citations
 
 Citation for flaskapp:
 Date: 10/21/2025
-The general layout of this app and database (package structure with models and forms) is inspired by Migel Grinberg's Flask mega tutorial.
+This Flask mega tutorial by Migel Grinberg provided help with our package structure, database models, and forms.
 Source URL: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
 
 Citation for flaskapp:
 Date: 10/25/2025
-Used as inspiration while making database models
+This Flask tutorial by Corey Schafer helped with our database and forms.
 Source URL: https://www.youtube.com/watch?v=MwZwr5Tvyxo&list=PL-osiE80TeTs4UjLw5MM6OjgkjFeUxCYH&index=1
 
 Citation for models.py:
 Date: 10/21/2025
 The use and format of SQLalchemy in models.py is partly guided by Ian Wilson's comment.
 Source URL: https://stackoverflow.com/a/76499049
+
+Citation for forms.py:
+Date: 10/26/2025
+This WTForms guide was heavily referenced when making the forms.
+Source URL: https://wtforms.readthedocs.io/en/2.3.x/fields/
+
