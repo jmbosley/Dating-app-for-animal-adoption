@@ -34,6 +34,32 @@
 			"response": []
 		},
 		{
+			"name": "201 Create Public Account 2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"Barbara\",\r\n  \"lastName\": \"Snith\",\r\n  \"email\": \"barbarasmith@gmail.com\",\r\n  \"password\": \"GHhfgdfg$231\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/accounts",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "200 Get Public Account",
 			"event": [
 				{
@@ -72,6 +98,33 @@
 				"body": {
 					"mode": "raw",
 					"raw": ""
+				},
+				"url": {
+					"raw": "{{app_url}}/accounts/{{p_acc1}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"accounts",
+						"{{p_acc1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Update Public Account",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"Waldo\",\r\n  \"lastName\": \"Butters\",\r\n  \"email\": \"jediofthecross@gmail.com\",\r\n  \"phoneNumber\": \"312-132-5231\",\r\n  \"password\": \"3213fdsfsd@\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
 				},
 				"url": {
 					"raw": "{{app_url}}/accounts/{{p_acc1}}",
@@ -129,33 +182,6 @@
 			"response": []
 		},
 		{
-			"name": "200 Update Public Account",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"firstName\": \"Waldo\",\r\n  \"lastName\": \"Butters\",\r\n  \"email\": \"jediofthecross@gmail.com\",\r\n  \"phoneNumber\": \"312-132-5231\",\r\n  \"password\": \"3213fdsfsd@\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{app_url}}/accounts/{{p_acc1}}",
-					"host": [
-						"{{app_url}}"
-					],
-					"path": [
-						"accounts",
-						"{{p_acc1}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "201 Create Admin Account",
 			"request": {
 				"method": "POST",
@@ -177,35 +203,6 @@
 					"path": [
 						"administrator"
 					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "200 Get Admin Account",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{app_url}}/administrator/{{a_acc1}}",
-					"host": [
-						"{{app_url}}"
-					],
-					"path": [
-						"administrator",
-						"{{a_acc1}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "204 Delete Admin Account",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": ""
 				}
 			},
 			"response": []
@@ -238,52 +235,163 @@
 			"response": []
 		},
 		{
-			"name": "201 Create Animal",
+			"name": "204 Delete Admin Account",
 			"request": {
-				"method": "POST",
+				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Fluffy\",\r\n  \"type\": \"Cat\",\r\n  \"breed\": \"Siamese\",\r\n  \"disposition\": \"Evil\",\r\n  \"availability\": true,\r\n  \"description\": \"Likes fish\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
-					"raw": "{{app_url}}/animals",
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get Admin Account Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/administrator/{{a_acc1}}",
 					"host": [
 						"{{app_url}}"
 					],
 					"path": [
-						"animals"
+						"administrator",
+						"{{a_acc1}}"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "201 Create Animal Minimum",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Wiggles\",\r\n  \"type\": \"Ferret\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
+			"name": "200 Set CSRF for Create Animal",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var cheerio = require('cheerio');\r",
+							"// https://community.postman.com/t/getting-a-specific-content-in-html-response/14734/8\r",
+							"$ = cheerio.load(pm.response.text());\r",
+							"\r",
+							"var token = $('[name=csrf_token]').val()\r",
+							"console.log(token);\r",
+							"\r",
+							"pm.environment.set(\"csrf_token\", token);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
 				"url": {
-					"raw": "{{app_url}}/animals",
+					"raw": "{{app_url}}/createanimal",
 					"host": [
 						"{{app_url}}"
 					],
 					"path": [
-						"animals"
+						"createanimal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create Animal",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var xsrfCookie = postman.getResponseCookie(\"csrftoken\"); postman.setEnvironmentVariable('csrftoken', xsrfCookie.value);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "\"Fluffy\"",
+							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "\"Cat\"",
+							"type": "text"
+						},
+						{
+							"key": "breed",
+							"value": "\"Siamese\"",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": " \"Likes fish\"",
+							"type": "text"
+						},
+						{
+							"key": "children",
+							"value": "y",
+							"type": "text"
+						},
+						{
+							"key": "dogs",
+							"value": "y",
+							"type": "text"
+						},
+						{
+							"key": "cats",
+							"value": "y",
+							"type": "text"
+						},
+						{
+							"key": "csrf_token",
+							"value": "{{csrf_token}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{app_url}}/createanimal",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"createanimal"
 					]
 				}
 			},
@@ -302,6 +410,33 @@
 					"path": [
 						"animals",
 						"{{a_acc1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Update Animal",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Bobby\",\r\n  \"type\": \"Dog\",\r\n  \"breed\": \"Daschund\",\r\n  \"disposition\": \"Cuddly\",\r\n  \"availability\": false,\r\n  \"description\": \"Sausage\",\r\n  \"numImages\": 5,\r\n  \"children\": false,\r\n  \"dogs\": false,\r\n  \"cats\": false,\r\n  \"idPublicAccount\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/animals/{{animal1}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"animals",
+						"{{animal1}}"
 					]
 				}
 			},
@@ -350,40 +485,13 @@
 			"response": []
 		},
 		{
-			"name": "200 Update Animal",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Robert\",\r\n  \"type\": \"Dog\",\r\n  \"breed\": \"Daschund\",\r\n  \"disposition\": \"Cuddly\",\r\n  \"availability\": false,\r\n  \"description\": \"Sausage\",\r\n  \"numImages\": 5\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{app_url}}/animals/{{a_acc1}}",
-					"host": [
-						"{{app_url}}"
-					],
-					"path": [
-						"animals",
-						"{{a_acc1}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "201 Create News Post",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"title\": \"News\",\r\n  \"body\": \"Adopt a cat today\"\r\n}",
+					"raw": "{\r\n  \"title\": \"News\",\r\n  \"body\": \"Adopt a cat today\",\r\n  \"idAnimal\": 1\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -415,6 +523,33 @@
 					"path": [
 						"newsPosts",
 						"{{news_post1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Update News Post",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Today's news\",\r\n  \"body\": \"Adopt a dog tomorrow\",\r\n  \"idAnimal\": 3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/newsPosts/{{news1}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"newsPosts",
+						"{{news1}}"
 					]
 				}
 			},
@@ -457,33 +592,6 @@
 					"path": [
 						"accounts",
 						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "200 Update News Post",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"title\": \"Blog\",\r\n  \"body\": \"Adopt a dog tomorrow\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{app_url}}/newsPosts/{{a_acc1}}",
-					"host": [
-						"{{app_url}}"
-					],
-					"path": [
-						"newsPosts",
-						"{{a_acc1}}"
 					]
 				}
 			},
