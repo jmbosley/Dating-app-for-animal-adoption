@@ -236,9 +236,10 @@ def createAnimal():
         db.session.add(new_animal)  # INSERT
         db.session.commit()
 
-        num_images = len(content.get('images', 0))
+        # empty image upload returns this: [<FileStorage: '' ('application/octet-stream')>]
+        num_images = len(content.get('images', []))
         # add pictures
-        if num_images != 0 and content['images'][0] != "":
+        if num_images != 0 and content['images'][0].filename != '':
             saveImages(content['images'], new_animal)
             query = sa.update(animal).where(animal.id == new_animal.id).values({'numImages': num_images})
             db.session.execute(query)
