@@ -208,24 +208,6 @@
 			"response": []
 		},
 		{
-			"name": "200 Get Admin Account",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{app_url}}/administrator/{{a_acc1}}",
-					"host": [
-						"{{app_url}}"
-					],
-					"path": [
-						"administrator",
-						"{{a_acc1}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "200 Update Admin Account",
 			"request": {
 				"method": "PUT",
@@ -264,78 +246,152 @@
 			"response": []
 		},
 		{
-			"name": "201 Create Animal (outdated)",
+			"name": "200 Get Admin Account Copy",
 			"request": {
-				"method": "POST",
+				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Fluffy\",\r\n  \"type\": \"Cat\",\r\n  \"breed\": \"Siamese\",\r\n  \"availability\": true,\r\n  \"description\": \"Likes fish\",\r\n  \"children\": true,\r\n  \"dogs\": true,\r\n  \"cats\": false,\r\n  \"idPublicAccount\": 1\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
-					"raw": "{{app_url}}/createAnimal",
+					"raw": "{{app_url}}/administrator/{{a_acc1}}",
 					"host": [
 						"{{app_url}}"
 					],
 					"path": [
-						"createAnimal"
+						"administrator",
+						"{{a_acc1}}"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "201 Create Animal 2",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Wiggles\",\r\n  \"type\": \"Ferret\",\r\n  \"children\": true,\r\n  \"dogs\": true,\r\n  \"cats\": true\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
+			"name": "200 Set CSRF for Create Animal",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var cheerio = require('cheerio');\r",
+							"// https://community.postman.com/t/getting-a-specific-content-in-html-response/14734/8\r",
+							"$ = cheerio.load(pm.response.text());\r",
+							"\r",
+							"var token = $('[name=csrf_token]').val()\r",
+							"console.log(token);\r",
+							"\r",
+							"pm.environment.set(\"csrf_token\", token);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
 				"url": {
-					"raw": "{{app_url}}/animals",
+					"raw": "{{app_url}}/createanimal",
 					"host": [
 						"{{app_url}}"
 					],
 					"path": [
-						"animals"
+						"createanimal"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "201 Create Animal 3",
+			"name": "201 Create Animal",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var xsrfCookie = postman.getResponseCookie(\"csrftoken\"); postman.setEnvironmentVariable('csrftoken', xsrfCookie.value);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Frank\",\r\n  \"type\": \"Cat\",\r\n  \"breed\": \"Siamese\",\r\n  \"children\": true,\r\n  \"dogs\": false,\r\n  \"cats\": true\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "\"Fluffy\"",
+							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "\"Cat\"",
+							"type": "text"
+						},
+						{
+							"key": "breed",
+							"value": "\"Siamese\"",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": " \"Likes fish\"",
+							"type": "text"
+						},
+						{
+							"key": "children",
+							"value": "y",
+							"type": "text"
+						},
+						{
+							"key": "dogs",
+							"value": "y",
+							"type": "text"
+						},
+						{
+							"key": "cats",
+							"value": "y",
+							"type": "text"
+						},
+						{
+							"key": "csrf_token",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
-					}
+					]
 				},
 				"url": {
-					"raw": "{{app_url}}/animals",
+					"raw": "{{app_url}}/createanimal",
 					"host": [
 						"{{app_url}}"
 					],
 					"path": [
-						"animals"
+						"createanimal"
 					]
 				}
 			},

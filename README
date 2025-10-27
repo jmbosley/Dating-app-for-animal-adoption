@@ -66,3 +66,7 @@ Date: 10/26/2025
 This WTForms guide was heavily referenced when making the forms.
 Source URL: https://wtforms.readthedocs.io/en/2.3.x/fields/
 
+Citation for tests:
+Date: 10/27/2025
+Danny Dainton's response was used to obtain csrf tokens for postman tests.
+https://community.postman.com/t/getting-a-specific-content-in-html-response/14734/8
