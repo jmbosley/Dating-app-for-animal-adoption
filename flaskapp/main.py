@@ -5,6 +5,7 @@ from flaskapp import db
 from flaskapp.models import publicAccount, adminAccount, animal, newsPost
 import sqlalchemy as sa
 
+
 ACCOUNTS = "accounts"
 ADMINS = "administrator"
 ANIMALS = "animals"
@@ -17,7 +18,6 @@ ERROR_MISSING_VALUE = "Not all required values were provided"
 ERROR_NOT_FOUND_ACC = "The requested account was not found"
 ERROR_NOT_FOUND_ANIMAL = "The requested animal was not found"
 ERROR_NOT_FOUND_NEWSPOST = "The requested news post was not found"
-
 
 @app.route("/")
 def root():
@@ -80,6 +80,14 @@ def PublicAccountFunctions(id):
             db.session.commit()
         return "Account was successfully updated!", 201
 
+@app.route('/' + "edit/" + ACCOUNTS + '/<int:id>', methods=['GET'])
+def PublicAccountEdit(id):
+    if request.method == 'GET':  # display page
+        query = sa.select(publicAccount).where(publicAccount.idPublicAccounts == id)
+        accounts = db.session.execute(query).mappings().all()
+        if accounts is None:
+            return ERROR_NOT_FOUND_ACC, 404
+        return render_template("editAccount.html", title="My Account", results=accounts), 200
 
 # -------------------------------------------------------- Admin Account
 

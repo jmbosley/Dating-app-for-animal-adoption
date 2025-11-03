@@ -1,12 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
 <body>
-
-	<h2>publicAccounts</h2>
+	
+	<h1>Account Page</h1>
 	{% for account in results %}
 	{% set account = account['publicAccount'] %}
-	<p>object: {{ account }}     firstName:{{ account.firstName }}    </p>
-	{% endfor %}
+	
+	<div class="split">
+			<div class="header">
+				<h2>{{ account.firstName }} {{account.lastName}} </h2>
+			</div>
 
+			<div class="image">
+				<img src="{{ url_for('static', filename='images/user_images/'+ account.lastName+account.firstName +'.png') }}" alt="User Image" class="user-image">
+    		</div>
+
+			<div class="text">
+				<p>
+				email: {{account.email}} <br>
+				Phone Number: {{ account.phoneNumber}}<br>
+				</p>
+			</div>
+
+			<div class="options">
+				<a href="/edit/accounts/{{account.idPublicAccounts}}" class="btn btn-secondary">Edit Profile</a>
+			</div>
+	</div>
+
+	{% endfor %}
 </body>
 {% endblock %}
