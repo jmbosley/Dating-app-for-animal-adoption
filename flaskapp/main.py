@@ -1,10 +1,12 @@
 # routes
 import os
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, url_for
 from flaskapp import app  # importing the flask app from our package defined in __init__.py
 from flaskapp import db
 from flaskapp.models import publicAccount, adminAccount, animal, newsPost
 import sqlalchemy as sa
+from sqlalchemy import inspect
+from flaskapp.forms import createAnimalForm, updateAccountForm
 
 
 ACCOUNTS = "accounts"
@@ -21,6 +23,29 @@ ERROR_MISSING_VALUE = "Not all required values were provided"
 ERROR_NOT_FOUND_ACC = "The requested account was not found"
 ERROR_NOT_FOUND_ANIMAL = "The requested animal was not found"
 ERROR_NOT_FOUND_NEWSPOST = "The requested news post was not found"
+
+def entityExists(model_type, id):
+    """
+    Takes model_type and id. Returns True if an entity with that id is found.
+    """
+    query = sa.select(model_type).where(model_type.id == id)
+    entity = db.session.execute(query).mappings().all()
+    if not entity:  # query returned empty list (falsy)
+        return False
+    return True
+def updateEntity(model_type, content, id):
+    """
+    Takes model_type, content, and id.
+    Updates model_type entity with that id based on content.
+    """
+    # https://docs.sqlalchemy.org/en/20/orm/mapping_styles.html#orm-mapper-inspection-mapper
+    # https://docs.sqlalchemy.org/en/20/core/dml.html
+    table_columns = inspect(model_type).columns
+    for column in table_columns:
+        if content.get(column.name, "") != "":
+            query = sa.update(model_type).where(model_type.id == id).values({column.name: content[column.name]})
+            db.session.execute(query)
+            db.session.commit()
 
 @app.route("/")
 def root():
@@ -49,6 +74,8 @@ def createPublicAccount():
 
 @app.route('/' + ACCOUNTS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
 def PublicAccountFunctions(id):
+    form = updateAccountForm()
+
     if request.method == 'GET':  # display page
         query = sa.select(publicAccount).where(publicAccount.id == id)
         accounts = db.session.execute(query).mappings().all()
@@ -61,37 +88,24 @@ def PublicAccountFunctions(id):
         db.session.commit()
         return ('', 204)
     if request.method == 'PUT':
-        content = request.get_json()
-        if 'firstName' in content:
-            query = sa.update(publicAccount).where(publicAccount.id == id).values(firstName=content['firstName'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'lastName' in content:
-            query = sa.update(publicAccount).where(publicAccount.id == id).values(lastName=content['lastName'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'email' in content:
-            query = sa.update(publicAccount).where(publicAccount.id == id).values(email=content['email'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'phoneNumber' in content:
-            query = sa.update(publicAccount).where(publicAccount.id == id).values(phoneNumber=content['phoneNumber'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'password' in content:
-            query = sa.update(publicAccount).where(publicAccount.id == id).values(password=content['password'])
-            db.session.execute(query)
-            db.session.commit()
-        return "Account was successfully updated!", 201
+        content = form.data
+        update_user = publicAccount(firstName=content.get('firstName'),
+                                    lastName=content.get('lastName')
+                                    )
+        db.session.update(update_user)  # INSERT
+        db.session.commit()
+        return redirect(url_for('/' + ACCOUNTS + str(publicAccount.id)))
 
 @app.route('/' + "edit/" + ACCOUNTS + '/<int:id>', methods=['GET'])
 def PublicAccountEdit(id):
+    form = updateAccountForm()
+
     if request.method == 'GET':  # display page
-        query = sa.select(publicAccount).where(publicAccount.idPublicAccounts == id)
+        query = sa.select(publicAccount).where(publicAccount.id == id)
         accounts = db.session.execute(query).mappings().all()
         if accounts is None:
             return ERROR_NOT_FOUND_ACC, 404
-        return render_template("editAccount.html", title="My Account", results=accounts), 200
+        return render_template("editAccount.html", title="My Account", results=accounts, form=form), 200
 
 # -------------------------------------------------------- Admin Account
 

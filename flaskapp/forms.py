@@ -34,3 +34,12 @@ class createAnimalForm(FlaskForm):
     images = MultipleFileField('Add some Images', validators=[validateImages, Optional()])
 
     submit = SubmitField('Submit')
+
+
+class updateAccountForm(FlaskForm):
+    firstName = StringField('firstName', validators=[Optional(), Length(min=1, max=45)])
+    lastName = StringField('lastName', validators=[Optional(), Length(min=1, max=45)])
+    email = StringField('email', validators=[Optional(), Length(min=1, max=45)])
+    phoneNumber = StringField('phoneNumber', validators=[Optional(), Length(min=1, max=45)])
+    images = MultipleFileField('Replace Image', validators=[validateImages, Optional()])
+    submit = SubmitField('Submit')

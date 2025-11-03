@@ -6,28 +6,59 @@
 	{% for account in results %}
 	{% set account = account['publicAccount'] %}
 
-    <form>
+    <form method="PUT" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }} <!-- add CRSF token -->
 	
 	<div class="split">
 			<div class="header">
-				<h2>First Name:<input type="text" id="fname" name="fname" placeholder="{{account.firstName}}">Last Name: <input type="text" id="lname" name="lname" placeholder="{{account.lastName}}"></h2>
+				<p>
+                {{ form.firstName.label }}: <!-- form field legend, input field -->
+                {{ form.firstName(size=20, placeholder=account.firstName) }}
+                {% for error in form.firstName.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                {{ form.lastName.label }}: <!-- form field legend, input field -->
+                {{ form.lastName(size=20, placeholder=account.lastName) }}
+                {% for error in form.lastName.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+             </p>
 			</div>
 
 			<div class="image">
-				<img src="{{ url_for('static', filename='images/user_images/'+ account.lastName+account.firstName +'.png') }}" alt="User Image" class="user-image">
+                <p>
+                    <img src="{{ url_for('static', filename='images/user_images/'+ account.lastName+account.firstName +'.png') }}" alt="User Image" class="user-image">
+                    <br>
+                    {{ form.images.label}}
+                    {{ form.images() }}
+                    {% for error in form.images.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
     		</div>
 
-
 			<div class="text">
-				<p>
-				email: <input type="text" id="email" name ="email" placeholder="{{account.email}}"><br>
-				Phone Number: <input type="text" id="phoneNumber" name ="phoneNumber" placeholder="{{account.phoneNumber}}"><br>
-				</p>
+                <p>
+                {{ form.email.label }}: <!-- form field legend, input field -->
+                {{ form.email(size=20, placeholder=account.email) }}
+                {% for error in form.firstName.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                <br>
+                <br>
+                {{ form.phoneNumber.label }}: <!-- form field legend, input field -->
+                {{ form.phoneNumber(size=20, placeholder=account.phoneNumber) }}
+                {% for error in form.phoneNumber.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+             </p>
 			</div>
 
 			<div class="options">
-                <a href="/login" class="btn btn-secondary">Save Profile</a>
-				<a href="/login" class="btn btn-secondary">Cancel</a>
+                <p>
+                    {{ form.submit(class="btn btn-secondary") }}
+                    
+                </p>
 			</div>
 	</div>
     </form>
