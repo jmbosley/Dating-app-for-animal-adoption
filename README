@@ -37,6 +37,8 @@ I created a brief demonstration of how the SQL code works in the /sqldemo route 
 Other helpful links:
 https://www.geeksforgeeks.org/python/sqlalchemy-orm-declaring-mapping/
 https://stackoverflow.com/questions/76498857/what-is-the-difference-between-mapped-column-and-column-in-sqlalchemy
+Sqlalchemy relationships:
+https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html
 
 Another Flask guide:
 https://www.youtube.com/watch?v=MwZwr5Tvyxo&list=PL-osiE80TeTs4UjLw5MM6OjgkjFeUxCYH&index=1
@@ -46,10 +48,25 @@ Citations
 
 Citation for flaskapp:
 Date: 10/21/2025
-The general layout of this app and database (package structure with models and forms) is inspired by Migel Grinberg's Flask mega tutorial.
+This Flask mega tutorial by Migel Grinberg provided help with our package structure, database models, and forms.
 Source URL: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
+
+Citation for flaskapp:
+Date: 10/25/2025
+This Flask tutorial by Corey Schafer helped with our database and forms.
+Source URL: https://www.youtube.com/watch?v=MwZwr5Tvyxo&list=PL-osiE80TeTs4UjLw5MM6OjgkjFeUxCYH&index=1
 
 Citation for models.py:
 Date: 10/21/2025
 The use and format of SQLalchemy in models.py is partly guided by Ian Wilson's comment.
 Source URL: https://stackoverflow.com/a/76499049
+
+Citation for forms.py:
+Date: 10/26/2025
+This WTForms guide was heavily referenced when making the forms.
+Source URL: https://wtforms.readthedocs.io/en/2.3.x/fields/
+
+Citation for tests:
+Date: 10/27/2025
+Danny Dainton's response was used to obtain csrf tokens for postman tests.
+https://community.postman.com/t/getting-a-specific-content-in-html-response/14734/8
