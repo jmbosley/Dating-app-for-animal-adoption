@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<body>
+	<h2>Create Animal</h2>
+	<form method="POST" action="" enctype="multipart/form-data">
+		{{ form.hidden_tag() }} <!-- add CRSF token -->
+		
+		<p>
+            {{ form.name.label }}<br> <!-- form field legend, input field -->
+            {{ form.name(size=45) }}
+			{% for error in form.name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+		<p>
+            {{ form.birthday.label }}<br>
+            {{ form.birthday() }}
+			{% for error in form.birthday.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+		<p>
+            {{ form.type.label }}<br> 
+            {{ form.type }}
+			{% for error in form.type.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+		<p>
+            {{ form.breed.label }}<br> <!-- might change to select later -->
+            {{ form.breed(size=45) }}
+			{% for error in form.breed.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+		<p>
+            {{ form.description.label }}<br>
+            {{ form.description() }}
+			{% for error in form.description.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+
+		<legend>Disposition</legend>
+		<p>
+            {{ form.children.label }}<br>
+            {{ form.children() }}
+			{% for error in form.children.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+		<p>
+            {{ form.dogs.label }}<br>
+            {{ form.dogs() }}
+			{% for error in form.dogs.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+		<p>
+            {{ form.cats.label }}<br>
+            {{ form.cats(size=45) }}
+			{% for error in form.cats.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+		<p>
+            {{ form.images.label }}<br>
+            {{ form.images() }}
+			{% for error in form.images.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+		<p>
+            {{ form.submit.label }}<br>
+            {{ form.submit() }}
+        </p>
+
+	</form>
+
+
+</body>
+{% endblock %}
