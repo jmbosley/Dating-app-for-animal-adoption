@@ -6,7 +6,7 @@
 	{% for account in results %}
 	{% set account = account['publicAccount'] %}
 
-    <form method="POST" action="/accounts/1" enctype="multipart/form-data">
+    <form method="POST" action="/accounts/{{account.id}}" enctype="multipart/form-data">
     <input type="hidden" name="_method" value="PUT">
 	
 	<div class="split">
