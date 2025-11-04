@@ -72,7 +72,7 @@ def createPublicAccount():
         return "Account was successfully created!", 201
 
 
-@app.route('/' + ACCOUNTS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
+@app.route('/' + ACCOUNTS + '/<int:id>', methods=['GET', 'DELETE', 'PUT', 'POST'])
 def PublicAccountFunctions(id):
     form = updateAccountForm()
 
@@ -87,14 +87,35 @@ def PublicAccountFunctions(id):
         db.session.execute(query)
         db.session.commit()
         return ('', 204)
-    if request.method == 'PUT':
+    if request.method == 'POST':
         content = form.data
-        update_user = publicAccount(firstName=content.get('firstName'),
-                                    lastName=content.get('lastName')
-                                    )
-        db.session.update(update_user)  # INSERT
-        db.session.commit()
-        return redirect(url_for('/' + ACCOUNTS + str(publicAccount.id)))
+        print(content)
+        curr_method = request.form["_method"]
+        if curr_method == "PUT":
+            if form.firstName.data:
+                query = sa.update(publicAccount).where(publicAccount.id == id).values(firstName=content['firstName'])
+                db.session.execute(query)
+                db.session.commit()
+            if form.lastName.data:
+                query = sa.update(publicAccount).where(publicAccount.id == id).values(lastName=content['lastName'])
+                db.session.execute(query)
+                db.session.commit()
+            if form.email.data:
+                query = sa.update(publicAccount).where(publicAccount.id == id).values(email=content['email'])
+                db.session.execute(query)
+                db.session.commit()
+            if form.phoneNumber.data:
+                query = sa.update(publicAccount).where(publicAccount.id == id).values(phoneNumber=content['phoneNumber'])
+                db.session.execute(query)
+                db.session.commit()
+            # if form.password.data:
+            #     query = sa.update(publicAccount).where(publicAccount.id == id).values(password=content['password'])
+            #     db.session.execute(query)
+            #     db.session.commit()
+            return redirect('/' + ACCOUNTS + '/' + str(id))
+        else:
+            return ERROR_FORM
+        
 
 @app.route('/' + "edit/" + ACCOUNTS + '/<int:id>', methods=['GET'])
 def PublicAccountEdit(id):
