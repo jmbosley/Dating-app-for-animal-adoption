@@ -1,9 +1,10 @@
 import os
 from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, SubmitField, BooleanField, MultipleFileField,
-                     DateField, SelectField, TextAreaField, IntegerField)
+                     DateField, SelectField, TextAreaField, IntegerField, FileField)
 from wtforms.validators import DataRequired, Optional, Length, Email, EqualTo, ValidationError
 from flask_wtf.file import FileAllowed, FileRequired
+from flaskapp.models import publicAccount, adminAccount, animal, newsPost
 
 
 TYPES = ["Dog", "Cat", "Bird", "Bunny", "Ferret", "Rat", "Mouse", "Chinchilla"]
@@ -17,6 +18,19 @@ def validateImages(form, field):
         file_extension = os.path.splitext(file.filename)[1]
         if file_extension not in [".jpg", ".png"]:
             raise ValidationError("File must be jpg or png")
+
+
+def validate_email(self, email):
+    user = publicAccount.query.filter_by(email=email.data).first()
+    if user:
+        raise ValidationError('email already exists')
+
+def validate_username(self, userName):
+    user = publicAccount.query.filter_by(userName=userName.data).first()
+    if user:
+        raise ValidationError('userName already exists')
+
+
 
 
 class createAnimalForm(FlaskForm):
@@ -41,5 +55,17 @@ class updateAccountForm(FlaskForm):
     lastName = StringField('lastName', validators=[Optional(), Length(min=1, max=45)])
     email = StringField('email', validators=[Optional(), Length(min=1, max=45)])
     phoneNumber = StringField('phoneNumber', validators=[Optional(), Length(min=1, max=45)])
-    images = MultipleFileField('Replace Image', validators=[validateImages, Optional()])
+    images = MultipleFileField('Add some Images', validators=[validateImages, Optional()])
+    submit = SubmitField('Submit')
+
+
+class createAccountForm(FlaskForm):
+    firstName = StringField('firstName', validators=[DataRequired(), Length(min=1, max=45)])
+    lastName = StringField('lastName', validators=[DataRequired(), Length(min=1, max=45)])
+    userName = StringField('userName', validators=[validate_username, Optional(), Length(min=1, max=45)])
+    password = StringField('password', validators=[DataRequired(), Length(min=1, max=45)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    email = StringField('email', validators=[DataRequired(), Length(min=1, max=45)])
+    phoneNumber = StringField('phoneNumber', validators=[DataRequired(), Length(min=1, max=45)])
+    images = MultipleFileField('Add some Images', validators=[validateImages, Optional()])
     submit = SubmitField('Submit')

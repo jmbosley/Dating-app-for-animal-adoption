@@ -27,7 +27,7 @@
 
 			<div class="image">
                 <p>
-                    <img src="{{ url_for('static', filename='images/user_images/'+ account.lastName+account.firstName +'.png') }}" alt="User Image" class="user-image">
+                    <img src="{{ url_for('static', filename='images/user_images/accountImg_'+  account.userName +'.jpg') }}" alt="User Image" class="user-image">
                     <br>
                     {{ form.images.label}}
                     {{ form.images() }}
@@ -39,12 +39,12 @@
 
 			<div class="text">
                 <p>
+                userName: {{account.userName}}<br>
                 {{ form.email.label }}: <!-- form field legend, input field -->
                 {{ form.email(size=20, placeholder=account.email) }}
                 {% for error in form.firstName.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
-                <br>
                 <br>
                 {{ form.phoneNumber.label }}: <!-- form field legend, input field -->
                 {{ form.phoneNumber(size=20, placeholder=account.phoneNumber) }}

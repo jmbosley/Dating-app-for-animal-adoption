@@ -1,12 +1,12 @@
 # routes
 import os
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, flash
 from flaskapp import app  # importing the flask app from our package defined in __init__.py
 from flaskapp import db
 from flaskapp.models import publicAccount, adminAccount, animal, newsPost
 import sqlalchemy as sa
 from sqlalchemy import inspect
-from flaskapp.forms import createAnimalForm, updateAccountForm
+from flaskapp.forms import createAnimalForm, updateAccountForm, createAccountForm
 
 
 ACCOUNTS = "accounts"
@@ -14,7 +14,7 @@ ADMINS = "administrator"
 ANIMALS = "animals"
 CREATE_ANIMAL = "createanimal"
 NEWSPOSTS = "newsPosts"
-MIN_ACCOUNT = ['firstName', 'lastName', 'email', 'password']  # optional: phoneNumber
+MIN_ACCOUNT = ['firstName', 'lastName', 'email', 'password', 'userName']  # optional: phoneNumber
 MIN_ANIMAL = ['name', 'type', 'children', 'dogs', 'cats']  # optional or defaulted: breed, availability, description, numImages
 MIN_NEWSPOST = ['title', 'body']  # idAnimal, datePublished
 # errors
@@ -53,23 +53,63 @@ def root():
 
 
 # -------------------------------------------------------- Public Account
+def saveAccountImages(images, publicAccount):
+    # delete old images
+    for img in range(0, publicAccount.numImages):
+        for extension in ['jpg', 'png']:
+            old_filename = f"accountImg_{publicAccount.userName}_{img}{extension}"
+            old_filepath = os.path.join(app.root_path, "static/images/user_images", old_filename)
+            if os.path.exists(old_filepath):
+                os.remove()
+
+    # add new images
+    for img in range(0, len(images)):
+        curr_img = images[img]
+        img_name = curr_img.filename
+
+        file_extension = os.path.splitext(img_name)[1]
+        new_filename = f"accountImg_{publicAccount.userName}{file_extension}"
+        new_filepath = os.path.join(app.root_path, "static/images/user_images", new_filename)
+
+        curr_img.save(new_filepath)
+    return
 
 # Create Public Account
-@app.route('/' + ACCOUNTS, methods=['POST'])
+@app.route('/' + ACCOUNTS, methods=['GET', 'POST'])
 def createPublicAccount():
-    if request.method == 'POST': # add account
-        content = request.get_json()
-        # check if minimum info was provided
-        if not (set(MIN_ACCOUNT).issubset(content)):
-            return ERROR_MISSING_VALUE, 400
-        new_account = publicAccount(firstName=content.get('firstName'),  # .get() prevents KeyError for nullables
-                                    lastName=content.get('lastName'),
-                                    email=content.get('email'),
-                                    phoneNumber=content.get('phoneNumber'),
-                                    password=content.get('password'))
-        db.session.add(new_account) # INSERT
-        db.session.commit()
-        return "Account was successfully created!", 201
+    form = createAccountForm()
+
+    if request.method == 'GET':
+        
+        return render_template('createAccount.html', title='Create Account', form=form)
+
+    if request.method == 'POST':  # add Account
+        if form.validate_on_submit():
+            content = form.data
+            # check if minimum info was provided
+            new_account = publicAccount(
+                                firstName=content.get('firstName'),
+                                lastName=content.get('lastName'),
+                                userName=content.get('userName'),
+                                password=content.get('password'),
+                                email=content.get('email'),
+                                phoneNumber=content.get('phoneNumber'),
+                                numImages=0,
+                                )
+
+            db.session.add(new_account)  # INSERT
+            db.session.commit()
+
+            # empty image upload returns this: [<FileStorage: '' ('application/octet-stream')>]
+            num_images = len(content.get('images', []))
+            # add pictures
+            if num_images != 0 and content['images'][0].filename != '':
+                saveAccountImages(content['images'], new_account)
+                query = sa.update(publicAccount).where(publicAccount.id == new_account.id).values({'numImages': num_images})
+                db.session.execute(query)
+                db.session.commit()
+
+            return redirect('/' + ACCOUNTS + '/' + str(new_account.id))
 
 
 @app.route('/' + ACCOUNTS + '/<int:id>', methods=['GET', 'DELETE', 'PUT', 'POST'])
@@ -108,10 +148,17 @@ def PublicAccountFunctions(id):
                 query = sa.update(publicAccount).where(publicAccount.id == id).values(phoneNumber=content['phoneNumber'])
                 db.session.execute(query)
                 db.session.commit()
-            # if form.password.data:
-            #     query = sa.update(publicAccount).where(publicAccount.id == id).values(password=content['password'])
-            #     db.session.execute(query)
-            #     db.session.commit()
+            
+            query = sa.select(publicAccount).where(publicAccount.id == id)
+            accounts = db.session.execute(query).scalars().one()
+
+            num_images = len(content.get('images', []))
+            # add pictures
+            if num_images != 0 and content['images'][0].filename != '':
+                saveAccountImages(content['images'], accounts)
+                query = sa.update(publicAccount).where(publicAccount.id == accounts.id).values({'numImages': num_images})
+                db.session.execute(query)
+                db.session.commit()
             return redirect('/' + ACCOUNTS + '/' + str(id))
         else:
             return ERROR_FORM
@@ -183,6 +230,7 @@ def AdminAccountFunctions(id):
             query = sa.update(adminAccount).where(adminAccount.id == id).values(password=content['password'])
             db.session.execute(query)
             db.session.commit()
+            
         return "Account was successfully updated!", 201
 
 
