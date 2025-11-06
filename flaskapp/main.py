@@ -110,6 +110,8 @@ def createPublicAccount():
                 db.session.commit()
 
             return redirect('/' + ACCOUNTS + '/' + str(new_account.id))
+        else:
+            return render_template('createAccount.html', title='Create Account', form=form)
 
 
 @app.route('/' + ACCOUNTS + '/<int:id>', methods=['GET', 'DELETE', 'PUT', 'POST'])
