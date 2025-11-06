@@ -7,6 +7,7 @@
 	{% set account = account['publicAccount'] %}
 
     <form method="POST" action="/accounts/{{account.id}}" enctype="multipart/form-data">
+	{{ form.hidden_tag() }} <!-- add CRSF token -->
     <input type="hidden" name="_method" value="PUT">
 	
 	<div class="split">
