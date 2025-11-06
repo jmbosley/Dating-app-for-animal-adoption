@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+<body>
+	
+	<h1>Account Page</h1>
+    <form method="POST" action="/accounts" enctype="multipart/form-data">
+		{{ form.hidden_tag() }} <!-- add CRSF token -->
+	
+	<div class="split">
+			<div class="header">
+				<p>
+                {{ form.firstName.label }}: <!-- form field legend, input field -->
+                {{ form.firstName(size=20) }}
+                {% for error in form.firstName.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                {{ form.lastName.label }}: <!-- form field legend, input field -->
+                {{ form.lastName(size=20) }}
+                {% for error in form.lastName.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+             </p>
+			</div>
+
+			<div class="image">
+                <p>
+                    {{ form.images.label}}
+                    {{ form.images() }}
+                    {% for error in form.images.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+    		</div>
+
+			<div class="text">
+                <p>
+                {{ form.userName.label }}: <!-- form field legend, input field -->
+                {{ form.userName(size=20) }}
+                {% for error in form.userName.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                <br>
+                <br>
+                {{ form.email.label }}: <!-- form field legend, input field -->
+                {{ form.email(size=20) }}
+                {% for error in form.firstName.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                <br>
+                <br>
+                {{ form.phoneNumber.label }}: <!-- form field legend, input field -->
+                {{ form.phoneNumber(size=20) }}
+                {% for error in form.phoneNumber.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                <br>
+                <br>
+                {{ form.password.label }}: <!-- form field legend, input field -->
+                {{ form.password(size=20) }}
+                {% for error in form.password.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                <br>
+                {{ form.confirm_password.label }}: <!-- form field legend, input field -->
+                {{ form.confirm_password(size=20) }}
+                {% for error in form.confirm_password.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+             </p>
+			</div>
+
+			<div class="options">
+                <p>
+                    {{ form.submit(class="btn btn-secondary") }}
+                    
+                </p>
+			</div>
+	</div>
+    </form>
+
+</body>
+{% endblock %}

@@ -13,9 +13,11 @@ class publicAccount(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     firstName: Mapped[str] = mapped_column(sa.String(45))
     lastName: Mapped[str] = mapped_column(sa.String(45))
+    userName: Mapped[str] = mapped_column(sa.String(45))
     email: Mapped[str] = mapped_column(sa.String(45))  # can set unique=true later (off for easier debugging)
     phoneNumber: Mapped[str] = mapped_column(sa.String(45), nullable=True)  # no default specified: default NULL
     password: Mapped[str] = mapped_column(sa.String(45))
+    numImages: Mapped[int] = mapped_column(default=0)  # image naming convention: accountImg_{{userName}}.jpg
 
     # can access with publicAccountObject.animals.select()
     animals: WriteOnlyMapped['animal'] = relationship(back_populates='publicAccount')
@@ -26,9 +28,12 @@ class adminAccount(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     firstName: Mapped[str] = mapped_column(sa.String(45))
     lastName: Mapped[str] = mapped_column(sa.String(45))
+    userName: Mapped[str] = mapped_column(sa.String(45))
     email: Mapped[str] = mapped_column(sa.String(45))  # unique = true
     phoneNumber: Mapped[str] = mapped_column(sa.String(45), nullable=True)
     password: Mapped[str] = mapped_column(sa.String(45))
+    numImages: Mapped[int] = mapped_column(default=0)  # image naming convention: accountImg_{{userName}}.jpg
+
 
 
 class animal(db.Model):
