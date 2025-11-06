@@ -4,6 +4,7 @@
 	
 	<h1>Account Page</h1>
     <form method="POST" action="/accounts" enctype="multipart/form-data">
+		{{ form.hidden_tag() }} <!-- add CRSF token -->
 	
 	<div class="split">
 			<div class="header">
