@@ -42,6 +42,8 @@ def updateEntity(model_type, content, id):
     # https://docs.sqlalchemy.org/en/20/core/dml.html
     table_columns = inspect(model_type).columns
     for column in table_columns:
+        # note: you cannot pass None for non-nullable values like Availability here. Pass the empty
+        # string / form field instead.
         if content.get(column.name, "") != "":
             # print(column.name, content[column.name])
             query = sa.update(model_type).where(model_type.id == id).values({column.name: content[column.name]})
