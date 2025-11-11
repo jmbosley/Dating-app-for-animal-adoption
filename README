@@ -70,3 +70,8 @@ Citation for tests:
 Date: 10/27/2025
 Danny Dainton's response was used to obtain csrf tokens for postman tests.
 https://community.postman.com/t/getting-a-specific-content-in-html-response/14734/8
+
+Citation for animal.html, style.css:
+Date: 11/11/2025
+The image slideshow is heavily based on the example in this link:
+https://www.w3schools.com/howto/howto_js_slideshow.asp

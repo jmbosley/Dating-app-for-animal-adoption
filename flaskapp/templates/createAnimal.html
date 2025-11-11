@@ -4,7 +4,13 @@
 	<h2>Create Animal</h2>
 	<form method="POST" action="" enctype="multipart/form-data">
 		{{ form.hidden_tag() }} <!-- add CRSF token -->
-		
+		<p>
+            {{ form.availability.label }}<br> 
+            {{ form.availability }}
+			{% for error in form.availability.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
 		<p>
             {{ form.name.label }}<br> <!-- form field legend, input field -->
             {{ form.name(size=45) }}
@@ -61,6 +67,13 @@
             {{ form.cats.label }}<br>
             {{ form.cats(size=45) }}
 			{% for error in form.cats.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.needsLeash.label }}<br>
+            {{ form.needsLeash(size=45) }}
+			{% for error in form.needsLeash.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>

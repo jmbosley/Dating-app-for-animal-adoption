@@ -9,8 +9,7 @@
 			<h2>{{ result.name }}</h2>
 		</div>
 
-
-	<!-- Slideshow made with help from https://www.w3schools.com/howto/howto_js_slideshow.asp -->
+<!-- Slideshow made with help from https://www.w3schools.com/howto/howto_js_slideshow.asp -->
 		<div class = "image">
 
 			<div class="slideshow-container">
@@ -18,7 +17,8 @@
 				<div class="mySlides fade">
     				<div class="numbertext">1 / 1</div>
 					{% set image_url = 'images/animalImages/placeholderAnimal.jpg' %}
-    				<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:50%" class="user-image">
+    				<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:50%" class="image">
+    				<div class="text"> {{ result.name }} </div>
   				</div>
 	
 				{% else %}
@@ -26,48 +26,32 @@
   				<div class="mySlides fade">
     				<div class="numbertext">{{img_num + 1}} / {{result.numImages}}</div>
 					{% set image_url = 'images/animalImages/animalImg_' + (result.id|string) + '_' + (img_num|string) + '.jpg' %}
-    				<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:50%" class="user-image">
+    				<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:50%" class="image">
+    				<div class="text"> {{ result.name }} </div>
   				</div>
 				{% endfor %}
 				{% endif %}
+			</div>
 
-			<!-- Next and previous buttons -->
+			<br>
+
+  			<!-- Next and previous buttons -->
 			<a class="prev" onclick="plusSlides(-1)">&#10094;</a>
   			<a class="next" onclick="plusSlides(1)">&#10095;</a>
-			</div>
 
-			<!-- The dots/circles -->
-			<div style="text-align:center">
+  			<!-- The dots/circles -->
+
+				<div style="text-align:center">
 				{% for img_num in range(result.numImages) %}
-  				<span class="dot" onclick="currentSlide({{img_num}} + 1)"></span>
+  					<span class="dot" onclick="currentSlide({{img_num}} + 1)"></span>
 				{% endfor %}
-			</div>
-		</div> <!-- img end -->
+				</div>
+		</div>
 
 
 		<div class="text">
 			<p>
-			Availability: {{result.availability}}<br><br>
-			id: {{result.id}}<br>
-			Name: {{result.name}}<br>
-
-			{% if result.birthday == None %}
-			{% set birthday = "Unknown" %}
-			{% else %}
-			{% set birthday = result.birthday %}
-			{% endif %}
-
-			Birthday: {{birthday}}<br>
-			Type: {{result.type}}<br>
-			Breed: {{result.breed}}<br><br>
-
-			Good with:<br>
-			Children: {{result.children}}<br>
-			Dogs: {{result.dogs}}<br>
-			Cats: {{result.cats}}<br><br>
-
-			Description:<br>
-			{{result.description}}
+			name: {{result.name}}<br>
 			</p>
 		</div>
 
@@ -84,7 +68,6 @@
 </body>
 
 <script>
-	// here rather than script.js so it can read jinja output
 	let slideIndex = 1;
 	showSlides(slideIndex);
 
