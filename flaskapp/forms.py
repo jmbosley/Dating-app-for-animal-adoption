@@ -43,7 +43,7 @@ class createAnimalForm(FlaskForm):
     birthday = DateField('Birthday', validators=[Optional()])
     type = SelectField('Type', validators=[DataRequired()], choices=ANIMAL_TYPES)
     breed = StringField('Breed', validators=[Optional(), Length(min=0, max=45)])
-    description = TextAreaField('Description', validators=[Optional(), Length(min=0, max=300)])
+    description = TextAreaField('Description', validators=[Optional(), Length(min=0, max=1000)])
 
     children = BooleanField('Good with Children', default=True)
     dogs = BooleanField('Good with Dogs', default=True)
@@ -66,7 +66,7 @@ class editAnimalForm(FlaskForm):
     birthday = DateField('Birthday', validators=[Optional()])
     type = SelectField('Type', validators=[Optional()], choices=ANIMAL_TYPES)
     breed = StringField('Breed', validators=[Optional(), Length(min=0, max=45)])
-    description = TextAreaField('Description', validators=[Optional(), Length(min=0, max=300)])
+    description = TextAreaField('Description', validators=[Optional(), Length(min=0, max=1000)])
 
     children = BooleanField('Good with Children')
     dogs = BooleanField('Good with Dogs')

@@ -44,7 +44,7 @@ class animal(db.Model):
     type: Mapped[str] = mapped_column(sa.String(45))
     breed: Mapped[str] = mapped_column(sa.String(45), nullable=True)
     availability: Mapped[str] = mapped_column(sa.String(45), default="Available")
-    description: Mapped[str] = mapped_column(sa.String(300), default='')
+    description: Mapped[str] = mapped_column(sa.String(1000), default='')
     numImages: Mapped[int] = mapped_column(default=0)  # image naming convention: animalImg_{id}_{num <= numImages}.jpg
     # disposition: friendly with who?
     children: Mapped[bool] = mapped_column(default=False)
