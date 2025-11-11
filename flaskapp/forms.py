@@ -55,6 +55,27 @@ class createAnimalForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class editAnimalForm(FlaskForm):
+    # field = fieldType('labelname', validators=[])
+    availability = SelectField('Availability', validators=[Optional()], choices=AVAILABILITY_TYPES)
+    idPublicAccount = SelectField('Owner', validators=[Optional()], choices=[])
+
+    name = StringField('Name', validators=[Optional(), Length(min=1, max=45)])
+    birthday = DateField('Birthday', validators=[Optional()])
+    type = SelectField('Type', validators=[Optional()], choices=ANIMAL_TYPES)
+    breed = StringField('Breed', validators=[Optional(), Length(min=0, max=45)])
+    description = TextAreaField('Description', validators=[Optional(), Length(min=0, max=300)])
+
+    children = BooleanField('Good with Children')
+    dogs = BooleanField('Good with Dogs')
+    cats = BooleanField('Good with Cats')
+    needsLeash = BooleanField('Must be leashed at all times')
+
+    images = MultipleFileField('Replace Images', validators=[validateImages, Optional()])
+
+    submit = SubmitField('Submit')
+
+
 class updateAccountForm(FlaskForm):
     firstName = StringField('firstName', validators=[Optional(), Length(min=1, max=45)])
     lastName = StringField('lastName', validators=[Optional(), Length(min=1, max=45)])

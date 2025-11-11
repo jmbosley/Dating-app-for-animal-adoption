@@ -50,7 +50,7 @@ class animal(db.Model):
     children: Mapped[bool] = mapped_column(default=False)
     dogs: Mapped[bool] = mapped_column(default=False)
     cats: Mapped[bool] = mapped_column(default=False)
-    needsLeash: Mapped[bool] = mapped_column(default=False)
+    needsLeash: Mapped[bool] = mapped_column(default=False, nullable=True)
 
     idPublicAccount: Mapped[int] = mapped_column(sa.ForeignKey(publicAccount.id), index=True, nullable=True)
 

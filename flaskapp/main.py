@@ -5,8 +5,8 @@ from flaskapp import app  # importing the flask app from our package defined in 
 from flaskapp import db
 from flaskapp.models import publicAccount, adminAccount, animal, newsPost
 import sqlalchemy as sa
-from sqlalchemy import inspect
-from flaskapp.forms import createAnimalForm, updateAccountForm, createAccountForm, deleteButton
+from sqlalchemy import inspect, func
+from flaskapp.forms import createAnimalForm, updateAccountForm, createAccountForm, deleteButton, editAnimalForm
 from PIL import Image
 
 
@@ -43,6 +43,7 @@ def updateEntity(model_type, content, id):
     table_columns = inspect(model_type).columns
     for column in table_columns:
         if content.get(column.name, "") != "":
+            # print(column.name, content[column.name])
             query = sa.update(model_type).where(model_type.id == id).values({column.name: content[column.name]})
             db.session.execute(query)
             db.session.commit()
@@ -59,7 +60,7 @@ def saveAccountImages(images, publicAccount):
         old_filename = f"accountImg_{publicAccount.userName}_{img}.jpg"
         old_filepath = os.path.join(app.root_path, "static/images/user_images", old_filename)
         if os.path.exists(old_filepath):
-            os.remove()
+            os.remove(old_filepath)
 
     # add new images
     for img in range(0, len(images)):
@@ -252,7 +253,7 @@ def saveImages(images, animal):
         old_filename = f"animalImg_{animal.id}_{img}.jpg"
         old_filepath = os.path.join(app.root_path, "static/images/animalImages", old_filename)
         if os.path.exists(old_filepath):
-            os.remove()
+            os.remove(old_filepath)
 
     # add new images
     for img in range(0, len(images)):
@@ -273,6 +274,20 @@ def saveImages(images, animal):
 
         curr_img.save(new_filepath)
     return
+
+def accountChoices():
+    """
+    Generates publicAccount choices for edit animal form
+    """
+    # select all publicAccounts id and userName. ordered alphabetically by userName
+    # https://stackoverflow.com/a/16573690
+    query = sa.select(publicAccount.id, publicAccount.userName).order_by(func.lower(publicAccount.userName))
+    all_accounts = db.session.execute(query).mappings().all()
+    accountList = [("", "None")]
+    for user in all_accounts:
+        # https://rtjom.com/blog/2016/10/using-wtforms-with-selectfield-and-fieldlist/
+        accountList.append((user["id"], user["userName"]))
+    return accountList
 
 
 # Create Animal
@@ -323,45 +338,88 @@ def createAnimal():
             db.session.execute(query)
             db.session.commit()
 
-        return "Animal was successfully created!", 201
+        return redirect('/' + ANIMALS + '/' + str(new_animal.id))
 
 
 @app.route('/' + ANIMALS + '/<int:id>', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def animalFunctions(id):
-    form = deleteButton()
+    del_form = deleteButton()
+    edit_form = editAnimalForm()
+
+    
     if request.method == 'GET':  # display page
+        
         query = sa.select(animal).where(animal.id == id)
         animals = db.session.execute(query).mappings().all()
         if animals is None:
             return ERROR_NOT_FOUND_ANIMAL, 404
         curr_animal = animals[0]['animal']
         
-        return render_template("animal.html", title=f"Pet Profile: {curr_animal.name}", result=curr_animal, form=form), 200
+        return render_template("animal.html", title=f"Pet Profile: {curr_animal.name}", result=curr_animal, form=del_form), 200
 
     if request.method == 'POST':
-        if form.validate_on_submit() is False:
-            return redirect('/' + ANIMALS + '/' + str(id))
-        
         curr_method = request.form['_method']
 
         if curr_method == 'DELETE':
+            form = del_form
+            if form.validate_on_submit() is False:
+                return redirect('/' + ANIMALS + '/' + str(id))
+
             query = sa.delete(animal).where(animal.id == id)
             db.session.execute(query)
             db.session.commit()
             return redirect('/')
 
         if curr_method == 'PUT':
-            content = request.get_json()
+            form = edit_form
+            form.idPublicAccount.choices=accountChoices()
+            content = form.data
 
-            if content.get('idPublicAccount') is not None:
-                # check if publicAccount exists
+            if form.validate_on_submit() is False:
+                print(form.errors.items())
+                return redirect('/' + "edit/" + ANIMALS + '/' + str(id))
+
+            if content.get('idPublicAccount'): # not falsy: "" or None
+                # check if publicAccount exists if one was provided
                 if entityExists(publicAccount, content.get('idPublicAccount')) is False:
                     return ERROR_NOT_FOUND_ACC, 400
+            else:
+                # get rid of owner
+                query = sa.update(animal).where(animal.id == id).values({'idPublicAccount': None})
+                db.session.execute(query)
+                db.session.commit()
 
             updateEntity(animal, content, id)
+            
+            # select animal
+            query = sa.select(animal).where(animal.id == id)
+            curr_animal = db.session.execute(query).mappings().all()
+            curr_animal = curr_animal[0]['animal']
+            # empty image upload returns this: [<FileStorage: '' ('application/octet-stream')>]
+            num_images = len(content.get('images', []))
+            # add pictures
+            if num_images != 0 and content['images'][0].filename != '':
+                saveImages(content['images'], curr_animal)
+                query = sa.update(animal).where(animal.id == id).values({'numImages': num_images})
+                db.session.execute(query)
+                db.session.commit()
 
-            return "Animal was successfully updated!", 201
+            return redirect('/' + ANIMALS + '/' + str(id))
 
+@app.route('/' + "edit/" + ANIMALS + '/<int:id>', methods=['GET'])
+def AnimalEdit(id):
+    form = editAnimalForm()
+    form.idPublicAccount.choices = accountChoices()
+
+    if request.method == 'GET':  # display page
+        query = sa.select(animal).where(animal.id == id)
+        # select animal
+        curr_animal = db.session.execute(query).mappings().all()
+        if curr_animal is None:
+            return ERROR_NOT_FOUND_ANIMAL, 404
+        curr_animal = curr_animal[0]['animal']
+
+        return render_template("editAnimal.html", title="Edit Animal", curr_animal=curr_animal, form=form), 200
 
 
 
@@ -410,7 +468,7 @@ def newsPostFunctions(id):
     if request.method == 'PUT':
         content = request.get_json()
 
-        if content.get('idAnimal') is not None:
+        if content.get('idAnimal') != False:
             # check if animal exists
             if entityExists(animal, content.get('idAnimal')) is False:
                 return ERROR_NOT_FOUND_ANIMAL, 400
