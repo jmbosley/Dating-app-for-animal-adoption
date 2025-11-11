@@ -52,6 +52,8 @@ class createAnimalForm(FlaskForm):
 
     images = MultipleFileField('Add some Images', validators=[validateImages, Optional()])
 
+    createNewsPost = BooleanField('Create a news post about this animal\'s arrival', default=False)
+
     submit = SubmitField('Submit')
 
 

@@ -338,6 +338,16 @@ def createAnimal():
             db.session.execute(query)
             db.session.commit()
 
+        # optionally create a newsPost
+        if content.get('createNewsPost') is True:
+            new_newsPost = newsPost(title=f'New Animal: {new_animal.name}',
+                                body=new_animal.description,
+                                idAnimal=new_animal.id
+                                )
+            db.session.add(new_newsPost)  # INSERT
+            db.session.commit()
+
+
         return redirect('/' + ANIMALS + '/' + str(new_animal.id))
 
 
@@ -424,6 +434,8 @@ def AnimalEdit(id):
 
 
 # -------------------------------------------------------- NewsPost
+
+
 
 # Create News Post
 @app.route('/' + NEWSPOSTS, methods=['POST'])
