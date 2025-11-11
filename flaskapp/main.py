@@ -37,6 +37,8 @@ def updateEntity(model_type, content, id):
     """
     Takes model_type, content, and id.
     Updates model_type entity with that id based on content.
+
+    Do not pass None for non-nullable values.
     """
     # https://docs.sqlalchemy.org/en/20/orm/mapping_styles.html#orm-mapper-inspection-mapper
     # https://docs.sqlalchemy.org/en/20/core/dml.html
@@ -158,7 +160,7 @@ def PublicAccountFunctions(id):
                 query = sa.update(publicAccount).where(publicAccount.id == id).values(phoneNumber=content['phoneNumber'])
                 db.session.execute(query)
                 db.session.commit()
-            
+
             query = sa.select(publicAccount).where(publicAccount.id == id)
             accounts = db.session.execute(query).scalars().one()
 
@@ -172,7 +174,7 @@ def PublicAccountFunctions(id):
             return redirect('/' + ACCOUNTS + '/' + str(id))
         else:
             return ERROR_FORM
-        
+
 
 @app.route('/' + "edit/" + ACCOUNTS + '/<int:id>', methods=['GET'])
 def PublicAccountEdit(id):
@@ -240,7 +242,7 @@ def AdminAccountFunctions(id):
             query = sa.update(adminAccount).where(adminAccount.id == id).values(password=content['password'])
             db.session.execute(query)
             db.session.commit()
-            
+    
         return "Account was successfully updated!", 201
 
 
@@ -249,6 +251,11 @@ def AdminAccountFunctions(id):
 # https://www.youtube.com/watch?v=803Ei2Sq-Zs&t=568s
 # https://blog.miguelgrinberg.com/post/handling-file-uploads-with-flask
 def saveImages(images, animal):
+    """
+    Takes a list of FileStorage images and an animal entity.
+    Converts all .png files to .jpg.
+    Updates the entity's numImages and its images in images/animalImages.
+    """
     # delete old images
     for img in range(0, animal.numImages):  # needs to be tested when edit animal page is done
         # assumes all saved images are .jpg
@@ -276,6 +283,7 @@ def saveImages(images, animal):
 
         curr_img.save(new_filepath)
     return
+
 
 def accountChoices():
     """
@@ -349,7 +357,6 @@ def createAnimal():
             db.session.add(new_newsPost)  # INSERT
             db.session.commit()
 
-
         return redirect('/' + ANIMALS + '/' + str(new_animal.id))
 
 
@@ -358,15 +365,15 @@ def animalFunctions(id):
     del_form = deleteButton()
     edit_form = editAnimalForm()
 
-    
+
     if request.method == 'GET':  # display page
-        
+
         query = sa.select(animal).where(animal.id == id)
         animals = db.session.execute(query).mappings().all()
         if animals is None:
             return ERROR_NOT_FOUND_ANIMAL, 404
         curr_animal = animals[0]['animal']
-        
+
         return render_template("animal.html", title=f"Pet Profile: {curr_animal.name}", result=curr_animal, form=del_form), 200
 
     if request.method == 'POST':
@@ -384,14 +391,15 @@ def animalFunctions(id):
 
         if curr_method == 'PUT':
             form = edit_form
+            # update dynamic choices
             form.idPublicAccount.choices=accountChoices()
             content = form.data
 
             if form.validate_on_submit() is False:
-                print(form.errors.items())
+                # print(form.errors.items())
                 return redirect('/' + "edit/" + ANIMALS + '/' + str(id))
 
-            if content.get('idPublicAccount'): # not falsy: "" or None
+            if content.get('idPublicAccount'): # if not falsy: "" or None
                 # check if publicAccount exists if one was provided
                 if entityExists(publicAccount, content.get('idPublicAccount')) is False:
                     return ERROR_NOT_FOUND_ACC, 400
@@ -402,11 +410,12 @@ def animalFunctions(id):
                 db.session.commit()
 
             updateEntity(animal, content, id)
-            
-            # select animal
+
+            # select animal we're updating
             query = sa.select(animal).where(animal.id == id)
             curr_animal = db.session.execute(query).mappings().all()
             curr_animal = curr_animal[0]['animal']
+
             # empty image upload returns this: [<FileStorage: '' ('application/octet-stream')>]
             num_images = len(content.get('images', []))
             # add pictures
@@ -434,9 +443,7 @@ def AnimalEdit(id):
         return render_template("editAnimal.html", title="Edit Animal", curr_animal=curr_animal, form=form), 200
 
 
-
 # -------------------------------------------------------- NewsPost
-
 
 
 # Create News Post
