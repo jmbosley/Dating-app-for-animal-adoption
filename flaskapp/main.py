@@ -242,11 +242,21 @@ def AdminAccountFunctions(id):
             query = sa.update(adminAccount).where(adminAccount.id == id).values(password=content['password'])
             db.session.execute(query)
             db.session.commit()
-    
+
         return "Account was successfully updated!", 201
 
 
 # -------------------------------------------------------- Animal
+
+
+def deleteImages(animal):
+    for img in range(0, animal.numImages):  # needs to be tested when edit animal page is done
+        # assumes all saved images are .jpg
+        old_filename = f"animalImg_{animal.id}_{img}.jpg"
+        old_filepath = os.path.join(app.root_path, "static/images/animalImages", old_filename)
+        if os.path.exists(old_filepath):
+            os.remove(old_filepath)
+
 
 # https://www.youtube.com/watch?v=803Ei2Sq-Zs&t=568s
 # https://blog.miguelgrinberg.com/post/handling-file-uploads-with-flask
@@ -257,12 +267,7 @@ def saveImages(images, animal):
     Updates the entity's numImages and its images in images/animalImages.
     """
     # delete old images
-    for img in range(0, animal.numImages):  # needs to be tested when edit animal page is done
-        # assumes all saved images are .jpg
-        old_filename = f"animalImg_{animal.id}_{img}.jpg"
-        old_filepath = os.path.join(app.root_path, "static/images/animalImages", old_filename)
-        if os.path.exists(old_filepath):
-            os.remove(old_filepath)
+    deleteImages(animal)
 
     # add new images
     for img in range(0, len(images)):
@@ -365,9 +370,7 @@ def animalFunctions(id):
     del_form = deleteButton()
     edit_form = editAnimalForm()
 
-
     if request.method == 'GET':  # display page
-
         query = sa.select(animal).where(animal.id == id)
         animals = db.session.execute(query).mappings().all()
         if animals is None:
@@ -383,6 +386,14 @@ def animalFunctions(id):
             form = del_form
             if form.validate_on_submit() is False:
                 return redirect('/' + ANIMALS + '/' + str(id))
+
+            # delete any animalImages
+            query = sa.select(animal).where(animal.id == id)
+            animals = db.session.execute(query).mappings().all()
+            if animals is None:
+                return ERROR_NOT_FOUND_ANIMAL, 404
+            curr_animal = animals[0]['animal']
+            deleteImages(curr_animal)
 
             query = sa.delete(animal).where(animal.id == id)
             db.session.execute(query)
