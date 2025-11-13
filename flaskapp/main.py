@@ -37,20 +37,32 @@ def updateEntity(model_type, content, id):
     """
     Takes model_type, content, and id.
     Updates model_type entity with that id based on content.
-
-    Do not pass None for non-nullable values.
     """
     # https://docs.sqlalchemy.org/en/20/orm/mapping_styles.html#orm-mapper-inspection-mapper
     # https://docs.sqlalchemy.org/en/20/core/dml.html
     table_columns = inspect(model_type).columns
     for column in table_columns:
-        # note: you cannot pass None for non-nullable values like Availability here. Pass the empty
-        # string / form field instead.
-        if content.get(column.name, "") != "":
+        print(column.name)
+        if content.get(column.name, "") not in ("", None) or column.nullable:
             # print(column.name, content[column.name])
             query = sa.update(model_type).where(model_type.id == id).values({column.name: content[column.name]})
             db.session.execute(query)
             db.session.commit()
+
+def prefillEditForm(form, entity):
+    """
+    Takes a form and an entity.
+    Fills that form according to entity's attributes.
+    """
+    form.idPublicAccount.choices = accountChoices()
+    for field in form:
+        try:
+            field_name = field.name
+            # https://stackoverflow.com/questions/31423495/how-to-dynamically-set-default-value-in-wtforms-radiofield
+            field.default = getattr(entity, field_name)  # entity.field_name
+        except AttributeError:
+            continue
+    form.process()
 
 @app.route("/")
 def root():
@@ -298,7 +310,7 @@ def accountChoices():
     # https://stackoverflow.com/a/16573690
     query = sa.select(publicAccount.id, publicAccount.userName).order_by(func.lower(publicAccount.userName))
     all_accounts = db.session.execute(query).mappings().all()
-    accountList = [("", "None")]
+    accountList = [(None, "None")]
     for user in all_accounts:
         # https://rtjom.com/blog/2016/10/using-wtforms-with-selectfield-and-fieldlist/
         accountList.append((user["id"], user["userName"]))
@@ -403,22 +415,18 @@ def animalFunctions(id):
         if curr_method == 'PUT':
             form = edit_form
             # update dynamic choices
-            form.idPublicAccount.choices=accountChoices()
+            form.idPublicAccount.choices = accountChoices()
             content = form.data
 
+            print(content)
             if form.validate_on_submit() is False:
-                # print(form.errors.items())
+                print(form.errors.items())
                 return redirect('/' + "edit/" + ANIMALS + '/' + str(id))
 
             if content.get('idPublicAccount'): # if not falsy: "" or None
                 # check if publicAccount exists if one was provided
                 if entityExists(publicAccount, content.get('idPublicAccount')) is False:
                     return ERROR_NOT_FOUND_ACC, 400
-            else:
-                # get rid of owner
-                query = sa.update(animal).where(animal.id == id).values({'idPublicAccount': None})
-                db.session.execute(query)
-                db.session.commit()
 
             updateEntity(animal, content, id)
 
@@ -441,7 +449,6 @@ def animalFunctions(id):
 @app.route('/' + "edit/" + ANIMALS + '/<int:id>', methods=['GET'])
 def AnimalEdit(id):
     form = editAnimalForm()
-    form.idPublicAccount.choices = accountChoices()
 
     if request.method == 'GET':  # display page
         query = sa.select(animal).where(animal.id == id)
@@ -450,6 +457,8 @@ def AnimalEdit(id):
         if curr_animal is None:
             return ERROR_NOT_FOUND_ANIMAL, 404
         curr_animal = curr_animal[0]['animal']
+
+        prefillEditForm(form, curr_animal)
 
         return render_template("editAnimal.html", title="Edit Animal", curr_animal=curr_animal, form=form), 200
 

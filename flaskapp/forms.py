@@ -32,7 +32,10 @@ def validate_username(self, userName):
     if user:
         raise ValidationError('userName already exists')
 
-
+def coerceIntSelect(input):
+    if input in ["None", None]:  # SelectFields will convert None to str, convert back
+        return None
+    return int(input)
 
 
 class createAnimalForm(FlaskForm):
@@ -60,7 +63,8 @@ class createAnimalForm(FlaskForm):
 class editAnimalForm(FlaskForm):
     # field = fieldType('labelname', validators=[])
     availability = SelectField('Availability', validators=[Optional()], choices=AVAILABILITY_TYPES)
-    idPublicAccount = SelectField('Owner', validators=[Optional()], choices=[])
+    # coerce is passed a function it inputs the selected value into.
+    idPublicAccount = SelectField('Owner', validators=[Optional()], choices=[], coerce=coerceIntSelect)
 
     name = StringField('Name', validators=[Optional(), Length(min=1, max=45)])
     birthday = DateField('Birthday', validators=[Optional()])
