@@ -42,7 +42,6 @@ def updateEntity(model_type, content, id):
     # https://docs.sqlalchemy.org/en/20/core/dml.html
     table_columns = inspect(model_type).columns
     for column in table_columns:
-        print(column.name)
         if content.get(column.name, "") not in ("", None) or column.nullable:
             # print(column.name, content[column.name])
             query = sa.update(model_type).where(model_type.id == id).values({column.name: content[column.name]})
@@ -417,9 +416,8 @@ def animalFunctions(id):
             form.idPublicAccount.choices = accountChoices()
             content = form.data
 
-            print(content)
             if form.validate_on_submit() is False:
-                print(form.errors.items())
+                # print(form.errors.items())
                 return redirect('/' + "edit/" + ANIMALS + '/' + str(id))
 
             if content.get('idPublicAccount'): # if not falsy: "" or None
