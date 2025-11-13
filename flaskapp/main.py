@@ -54,7 +54,6 @@ def prefillEditForm(form, entity):
     Takes a form and an entity.
     Fills that form according to entity's attributes.
     """
-    form.idPublicAccount.choices = accountChoices()
     for field in form:
         try:
             field_name = field.name
@@ -458,6 +457,7 @@ def AnimalEdit(id):
             return ERROR_NOT_FOUND_ANIMAL, 404
         curr_animal = curr_animal[0]['animal']
 
+        form.idPublicAccount.choices = accountChoices()
         prefillEditForm(form, curr_animal)
 
         return render_template("editAnimal.html", title="Edit Animal", curr_animal=curr_animal, form=form), 200
