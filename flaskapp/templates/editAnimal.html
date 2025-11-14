@@ -2,22 +2,30 @@
 {% block content %}
 <body>
 	<h2>Create Animal</h2>
-	<form method="POST" action="" enctype="multipart/form-data">
+	<form method="POST" action="/animals/{{curr_animal.id}}" enctype="multipart/form-data">
     {{ form.hidden_tag() }} <!-- add CRSF token -->
+    <input type="hidden" name="_method" value="PUT">
 
     <div class="split">
 
 		<div class="header">
 		<p>
             {{ form.availability.label }}<br> 
-            {{ form.availability }}
+            {{ form.availability() }}
 			{% for error in form.availability.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.idPublicAccount.label }}<br>
+            {{ form.idPublicAccount(size=10) }}
+			{% for error in form.idPublicAccount.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
 		<p>
             {{ form.name.label }}<br> <!-- form field legend, input field -->
-            {{ form.name(size=45) }}
+            {{ form.name(size=45, placeholder=curr_animal.name) }}
 			{% for error in form.name.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
@@ -31,21 +39,21 @@
         </p>
 		<p>
             {{ form.type.label }}<br> 
-            {{ form.type }}
+            {{ form.type() }}
 			{% for error in form.type.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
 		<p>
             {{ form.breed.label }}<br> <!-- might change to select later -->
-            {{ form.breed(size=45) }}
+            {{ form.breed(size=45, placeholder=curr_animal.breed) }}
 			{% for error in form.breed.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
 		<p>
             {{ form.description.label }}<br>
-            {{ form.description() }}
+            {{ form.description(placeholder=curr_animal.description) }}
 			{% for error in form.description.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
@@ -70,14 +78,14 @@
         </p>
 		<p>
             {{ form.cats.label }}<br>
-            {{ form.cats(size=45) }}
+            {{ form.cats() }}
 			{% for error in form.cats.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
             {{ form.needsLeash.label }}<br>
-            {{ form.needsLeash(size=45) }}
+            {{ form.needsLeash() }}
 			{% for error in form.needsLeash.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
@@ -89,14 +97,6 @@
             {{ form.images.label }}<br>
             {{ form.images() }}
 			{% for error in form.images.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <br><br>
-        <p>
-            {{ form.createNewsPost.label }}<br>
-            {{ form.createNewsPost }}
-			{% for error in form.createNewsPost.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>

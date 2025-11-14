@@ -5,17 +5,17 @@ from flaskapp import app  # importing the flask app from our package defined in 
 from flaskapp import db
 from flaskapp.models import publicAccount, adminAccount, animal, newsPost
 import sqlalchemy as sa
-from sqlalchemy import inspect
-from flaskapp.forms import createAnimalForm, updateAccountForm, createAccountForm
+from sqlalchemy import inspect, func
+from flaskapp.forms import createAnimalForm, updateAccountForm, createAccountForm, deleteButton, editAnimalForm
+from PIL import Image
 
 
 ACCOUNTS = "accounts"
 ADMINS = "administrator"
 ANIMALS = "animals"
-CREATE_ANIMAL = "createanimal"
 NEWSPOSTS = "newsPosts"
 MIN_ACCOUNT = ['firstName', 'lastName', 'email', 'password', 'userName']  # optional: phoneNumber
-MIN_ANIMAL = ['name', 'type', 'children', 'dogs', 'cats']  # optional or defaulted: breed, availability, description, numImages
+MIN_ANIMAL = ['name', 'type', 'children', 'dogs', 'cats', 'needsLeash']  # optional or defaulted: breed, availability, description, numImages
 MIN_NEWSPOST = ['title', 'body']  # idAnimal, datePublished
 # errors
 ERROR_FORM = "Form returned an error"
@@ -42,10 +42,25 @@ def updateEntity(model_type, content, id):
     # https://docs.sqlalchemy.org/en/20/core/dml.html
     table_columns = inspect(model_type).columns
     for column in table_columns:
-        if content.get(column.name, "") != "":
+        if content.get(column.name, "") not in ("", None) or column.nullable:
+            # print(column.name, content[column.name])
             query = sa.update(model_type).where(model_type.id == id).values({column.name: content[column.name]})
             db.session.execute(query)
             db.session.commit()
+
+def prefillEditForm(form, entity):
+    """
+    Takes a form and an entity.
+    Fills that form according to entity's attributes.
+    """
+    for field in form:
+        try:
+            field_name = field.name
+            # https://stackoverflow.com/questions/31423495/how-to-dynamically-set-default-value-in-wtforms-radiofield
+            field.default = getattr(entity, field_name)  # entity.field_name
+        except AttributeError:
+            continue
+    form.process()
 
 @app.route("/")
 def root():
@@ -56,18 +71,23 @@ def root():
 def saveAccountImages(images, publicAccount):
     # delete old images
     for img in range(0, publicAccount.numImages):
-        for extension in ['jpg', 'png']:
-            old_filename = f"accountImg_{publicAccount.userName}_{img}{extension}"
-            old_filepath = os.path.join(app.root_path, "static/images/user_images", old_filename)
-            if os.path.exists(old_filepath):
-                os.remove()
+        old_filename = f"accountImg_{publicAccount.userName}_{img}.jpg"
+        old_filepath = os.path.join(app.root_path, "static/images/user_images", old_filename)
+        if os.path.exists(old_filepath):
+            os.remove(old_filepath)
 
     # add new images
     for img in range(0, len(images)):
         curr_img = images[img]
-        img_name = curr_img.filename
 
-        file_extension = os.path.splitext(img_name)[1]
+        file_extension = os.path.splitext(curr_img.filename)[1]
+
+        # convert any png to jpg
+        if file_extension == '.png':
+            curr_img = Image.open(curr_img)  # convert with Pillow
+            curr_img = curr_img.convert('RGB')
+            file_extension = '.jpg'
+
         new_filename = f"accountImg_{publicAccount.userName}{file_extension}"
         new_filepath = os.path.join(app.root_path, "static/images/user_images", new_filename)
 
@@ -80,7 +100,7 @@ def createPublicAccount():
     form = createAccountForm()
 
     if request.method == 'GET':
-        
+
         return render_template('createAccount.html', title='Create Account', form=form)
 
     if request.method == 'POST':  # add Account
@@ -150,7 +170,7 @@ def PublicAccountFunctions(id):
                 query = sa.update(publicAccount).where(publicAccount.id == id).values(phoneNumber=content['phoneNumber'])
                 db.session.execute(query)
                 db.session.commit()
-            
+
             query = sa.select(publicAccount).where(publicAccount.id == id)
             accounts = db.session.execute(query).scalars().one()
 
@@ -164,7 +184,7 @@ def PublicAccountFunctions(id):
             return redirect('/' + ACCOUNTS + '/' + str(id))
         else:
             return ERROR_FORM
-        
+
 
 @app.route('/' + "edit/" + ACCOUNTS + '/<int:id>', methods=['GET'])
 def PublicAccountEdit(id):
@@ -232,38 +252,71 @@ def AdminAccountFunctions(id):
             query = sa.update(adminAccount).where(adminAccount.id == id).values(password=content['password'])
             db.session.execute(query)
             db.session.commit()
-            
+
         return "Account was successfully updated!", 201
 
 
 # -------------------------------------------------------- Animal
 
+
+def deleteImages(animal):
+    for img in range(0, animal.numImages):  # needs to be tested when edit animal page is done
+        # assumes all saved images are .jpg
+        old_filename = f"animalImg_{animal.id}_{img}.jpg"
+        old_filepath = os.path.join(app.root_path, "static/images/animalImages", old_filename)
+        if os.path.exists(old_filepath):
+            os.remove(old_filepath)
+
+
 # https://www.youtube.com/watch?v=803Ei2Sq-Zs&t=568s
 # https://blog.miguelgrinberg.com/post/handling-file-uploads-with-flask
 def saveImages(images, animal):
+    """
+    Takes a list of FileStorage images and an animal entity.
+    Converts all .png files to .jpg.
+    Updates the entity's numImages and its images in images/animalImages.
+    """
     # delete old images
-    for img in range(0, animal.numImages):  # needs to be tested when edit animal page is done
-        for extension in ['jpg', 'png']:
-            old_filename = f"animalImg_{animal.id}_{img}{extension}"
-            old_filepath = os.path.join(app.root_path, "static/animalImages", old_filename)
-            if os.path.exists(old_filepath):
-                os.remove()
+    deleteImages(animal)
 
     # add new images
     for img in range(0, len(images)):
         curr_img = images[img]
-        img_name = curr_img.filename
+        # file_name = curr_img.filename
 
-        file_extension = os.path.splitext(img_name)[1]
+        file_name = os.path.splitext(curr_img.filename)[0]
+        file_extension = os.path.splitext(curr_img.filename)[1]
+
+        # convert any png to jpg
+        if file_extension == '.png':
+            curr_img = Image.open(curr_img)  # convert with Pillow
+            curr_img = curr_img.convert('RGB')
+            file_extension = '.jpg'
+
         new_filename = f"animalImg_{animal.id}_{img}{file_extension}"
-        new_filepath = os.path.join(app.root_path, "static/animalImages", new_filename)
+        new_filepath = os.path.join(app.root_path, "static/images/animalImages", new_filename)
 
         curr_img.save(new_filepath)
     return
 
 
+def accountChoices():
+    """
+    Generates publicAccount choices for edit animal form
+    """
+    # select all publicAccounts id and userName. ordered alphabetically by userName
+    # https://stackoverflow.com/a/16573690
+    query = sa.select(publicAccount.id, publicAccount.userName).order_by(func.lower(publicAccount.userName))
+    all_accounts = db.session.execute(query).mappings().all()
+    accountList = [(None, "None")]
+    for user in all_accounts:
+        # https://rtjom.com/blog/2016/10/using-wtforms-with-selectfield-and-fieldlist/
+        accountList.append((user["id"], user["userName"]))
+    return accountList
+
+
 # Create Animal
-@app.route('/' + CREATE_ANIMAL, methods=['GET', 'POST'])
+@app.route('/' + ANIMALS, methods=['GET', 'POST'])
 def createAnimal():
     form = createAnimalForm()
 
@@ -288,6 +341,7 @@ def createAnimal():
                             children=content.get('children'),
                             dogs=content.get('dogs'),
                             cats=content.get('cats'),
+                            needsLeash=content.get('needsLeash'),
                             idPublicAccount=content.get('idPublicAccount')
                             )
 
@@ -309,38 +363,106 @@ def createAnimal():
             db.session.execute(query)
             db.session.commit()
 
-        return "Animal was successfully created!", 201
+        # optionally create a newsPost
+        if content.get('createNewsPost') is True:
+            new_newsPost = newsPost(title=f'New Animal: {new_animal.name}',
+                                body=new_animal.description,
+                                idAnimal=new_animal.id
+                                )
+            db.session.add(new_newsPost)  # INSERT
+            db.session.commit()
+
+        return redirect('/' + ANIMALS + '/' + str(new_animal.id))
 
 
-@app.route('/' + ANIMALS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
+@app.route('/' + ANIMALS + '/<int:id>', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def animalFunctions(id):
+    del_form = deleteButton()
+    edit_form = editAnimalForm()
+
     if request.method == 'GET':  # display page
         query = sa.select(animal).where(animal.id == id)
         animals = db.session.execute(query).mappings().all()
         if animals is None:
             return ERROR_NOT_FOUND_ANIMAL, 404
-        return render_template("animal.html", title="Animals", results=animals), 200
+        curr_animal = animals[0]['animal']
 
-    if request.method == 'DELETE':
-        query = sa.delete(animal).where(animal.id == id)
-        db.session.execute(query)
-        db.session.commit()
-        return ('', 204)
+        return render_template("animal.html", title=f"Pet Profile: {curr_animal.name}", result=curr_animal, form=del_form), 200
 
-    if request.method == 'PUT':
-        content = request.get_json()
+    if request.method == 'POST':
+        curr_method = request.form['_method']
 
-        if content.get('idPublicAccount') is not None:
-            # check if publicAccount exists
-            if entityExists(publicAccount, content.get('idPublicAccount')) is False:
-                return ERROR_NOT_FOUND_ACC, 400
+        if curr_method == 'DELETE':
+            form = del_form
+            if form.validate_on_submit() is False:
+                return redirect('/' + ANIMALS + '/' + str(id))
 
-        updateEntity(animal, content, id)
+            # delete any animalImages
+            query = sa.select(animal).where(animal.id == id)
+            animals = db.session.execute(query).mappings().all()
+            if animals is None:
+                return ERROR_NOT_FOUND_ANIMAL, 404
+            curr_animal = animals[0]['animal']
+            deleteImages(curr_animal)
 
-        return "Animal was successfully updated!", 201
+            query = sa.delete(animal).where(animal.id == id)
+            db.session.execute(query)
+            db.session.commit()
+            return redirect('/')
+
+        if curr_method == 'PUT':
+            form = edit_form
+            # update dynamic choices
+            form.idPublicAccount.choices = accountChoices()
+            content = form.data
+
+            if form.validate_on_submit() is False:
+                # print(form.errors.items())
+                return redirect('/' + "edit/" + ANIMALS + '/' + str(id))
+
+            if content.get('idPublicAccount'): # if not falsy: "" or None
+                # check if publicAccount exists if one was provided
+                if entityExists(publicAccount, content.get('idPublicAccount')) is False:
+                    return ERROR_NOT_FOUND_ACC, 400
+
+            updateEntity(animal, content, id)
+
+            # select animal we're updating
+            query = sa.select(animal).where(animal.id == id)
+            curr_animal = db.session.execute(query).mappings().all()
+            curr_animal = curr_animal[0]['animal']
+
+            # empty image upload returns this: [<FileStorage: '' ('application/octet-stream')>]
+            num_images = len(content.get('images', []))
+            # add pictures
+            if num_images != 0 and content['images'][0].filename != '':
+                saveImages(content['images'], curr_animal)
+                query = sa.update(animal).where(animal.id == id).values({'numImages': num_images})
+                db.session.execute(query)
+                db.session.commit()
+
+            return redirect('/' + ANIMALS + '/' + str(id))
+
+@app.route('/' + "edit/" + ANIMALS + '/<int:id>', methods=['GET'])
+def AnimalEdit(id):
+    form = editAnimalForm()
+
+    if request.method == 'GET':  # display page
+        query = sa.select(animal).where(animal.id == id)
+        # select animal
+        curr_animal = db.session.execute(query).mappings().all()
+        if curr_animal is None:
+            return ERROR_NOT_FOUND_ANIMAL, 404
+        curr_animal = curr_animal[0]['animal']
+
+        form.idPublicAccount.choices = accountChoices()
+        prefillEditForm(form, curr_animal)
+
+        return render_template("editAnimal.html", title="Edit Animal", curr_animal=curr_animal, form=form), 200
 
 
 # -------------------------------------------------------- NewsPost
+
 
 # Create News Post
 @app.route('/' + NEWSPOSTS, methods=['POST'])
@@ -385,7 +507,7 @@ def newsPostFunctions(id):
     if request.method == 'PUT':
         content = request.get_json()
 
-        if content.get('idAnimal') is not None:
+        if content.get('idAnimal') != False:
             # check if animal exists
             if entityExists(animal, content.get('idAnimal')) is False:
                 return ERROR_NOT_FOUND_ANIMAL, 400

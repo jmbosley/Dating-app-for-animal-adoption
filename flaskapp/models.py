@@ -43,13 +43,14 @@ class animal(db.Model):
     birthday: Mapped[date]  = mapped_column(index=True, nullable=True)  # index for sorting purposes
     type: Mapped[str] = mapped_column(sa.String(45))
     breed: Mapped[str] = mapped_column(sa.String(45), nullable=True)
-    availability: Mapped[bool] = mapped_column(default=True)
-    description: Mapped[str] = mapped_column(sa.String(300), default='')
+    availability: Mapped[str] = mapped_column(sa.String(45), default="Available")
+    description: Mapped[str] = mapped_column(sa.String(1000), default='')
     numImages: Mapped[int] = mapped_column(default=0)  # image naming convention: animalImg_{id}_{num <= numImages}.jpg
     # disposition: friendly with who?
-    children: Mapped[bool] = mapped_column()
-    dogs: Mapped[bool] = mapped_column()
-    cats: Mapped[bool] = mapped_column()
+    children: Mapped[bool] = mapped_column(default=False)
+    dogs: Mapped[bool] = mapped_column(default=False)
+    cats: Mapped[bool] = mapped_column(default=False)
+    needsLeash: Mapped[bool] = mapped_column(default=False, nullable=True)
 
     idPublicAccount: Mapped[int] = mapped_column(sa.ForeignKey(publicAccount.id), index=True, nullable=True)
 

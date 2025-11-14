@@ -1,12 +1,100 @@
 {% extends "base.html" %}
 {% block content %}
 <body>
+	<h1>{{title}}</h1>
 
-	<h2>Animals</h2>
-	{% for animal in results %}
-	{% set animal = animal['animal'] %}
-	<p>object: {{ animal }}     firstName:{{ animal.name }}    </p>
-	{% endfor %}
+	<div class="split">
+
+		<div class="header">
+			<h2>{{ result.name }}</h2>
+		</div>
+
+
+	<!-- Slideshow made with help from https://www.w3schools.com/howto/howto_js_slideshow.asp -->
+		<div class = "image">
+
+			<div class="slideshow-container">
+				{% if result.numImages == 0 %}
+				<!-- placeholder image -->
+				<div class="mySlides fade">
+    				<div class="numbertext">1 / 1</div>
+					{% set image_url = 'images/animalImages/placeholderAnimal.jpg' %}
+    				<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:100%" class="user-image">
+  				</div>
+	
+				{% else %}
+				{% for img_num in range(result.numImages) %}
+  				<div class="mySlides fade">
+    				<div class="numbertext">{{img_num + 1}} / {{result.numImages}}</div>
+					{% set image_url = 'images/animalImages/animalImg_' + (result.id|string) + '_' + (img_num|string) + '.jpg' %}
+    				<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:100%" class="user-image">
+  				</div>
+				{% endfor %}
+				{% endif %}
+			
+			{% if result.numImages > 1 %}
+			<!-- Next and previous buttons -->
+			<a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+  			<a class="next" onclick="plusSlides(1)">&#10095;</a>
+			{% endif %}
+			</div>
+			
+			{% if result.numImages > 1 %}
+			<!-- The dots/circles -->
+			<div style="text-align:center">
+				{% for img_num in range(result.numImages) %}
+  				<span class="dot" onclick="currentSlide({{img_num}} + 1)"></span>
+				{% endfor %}
+			</div>
+			{% endif %}
+			
+		</div> <!-- img end -->
+
+
+		<div class="text">
+			<p>
+			Availability: {{result.availability}}<br><br>
+			id: {{result.id}}<br>
+			Name: {{result.name}}<br>
+
+			{% if result.birthday == None %}
+			{% set birthday = "Unknown" %}
+			{% else %}
+			{% set birthday = result.birthday %}
+			{% endif %}
+
+			Birthday: {{birthday}}<br>
+			Type: {{result.type}}<br>
+			Breed: {{result.breed}}<br><br>
+
+			Good with:<br>
+			Children: {{result.children}}<br>
+			Dogs: {{result.dogs}}<br>
+			Cats: {{result.cats}}<br><br>
+			Must be leashed at all times: {{result.needsLeash}}<br><br>
+
+			Description:<br>
+			{{result.description}}
+			</p>
+		</div>
+
+
+		<div class="options">
+			{% if 1 == 1 %} <!-- placeholder for admin restriction -->
+			<form id="animalOptions" action="/animals/{{result.id}}" method="POST" enctype="multipart/form-data">
+				{{ form.hidden_tag() }}
+				<input type="hidden" name="_method" value="DELETE">
+				{{ form.delete(value="Delete Animal", onclick="return confirmAnimalDeletion()", class="btn btn-secondary") }}
+				<a href="/edit/animals/{{result.id}}" class="btn btn-secondary">Edit Animal</a>
+			{% endif %}
+			</form>
+		</div>
 
 </body>
+
+<script>
+	let slideIndex = 1;
+	showSlides(slideIndex);
+</script>
+
 {% endblock %}
