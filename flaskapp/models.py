@@ -7,8 +7,8 @@ from sqlalchemy.orm import Mapped, WriteOnlyMapped, mapped_column, relationship
 # create a new model
 # optional read: https://www.geeksforgeeks.org/python/sqlalchemy-orm-declaring-mapping/
 # https://stackoverflow.com/questions/76498857/what-is-the-difference-between-mapped-column-and-column-in-sqlalchemy
-class publicAccount(db.Model):
-    __tablename__ = 'publicAccounts'
+class user(db.Model):
+    __tablename__ = 'users'
     # attributeName: typehint = mapped_column(sql specifications)
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     firstName: Mapped[str] = mapped_column(sa.String(45))
@@ -18,22 +18,10 @@ class publicAccount(db.Model):
     phoneNumber: Mapped[str] = mapped_column(sa.String(45), nullable=True)  # no default specified: default NULL
     password: Mapped[str] = mapped_column(sa.String(45))
     numImages: Mapped[int] = mapped_column(default=0)  # image naming convention: accountImg_{{userName}}.jpg
+    admin: Mapped[bool] = mapped_column(default=False)
 
-    # can access with publicAccountObject.animals.select()
-    animals: WriteOnlyMapped['animal'] = relationship(back_populates='publicAccount')
-
-
-class adminAccount(db.Model):
-    __tablename__ = 'adminAccounts'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    firstName: Mapped[str] = mapped_column(sa.String(45))
-    lastName: Mapped[str] = mapped_column(sa.String(45))
-    userName: Mapped[str] = mapped_column(sa.String(45))
-    email: Mapped[str] = mapped_column(sa.String(45))  # unique = true
-    phoneNumber: Mapped[str] = mapped_column(sa.String(45), nullable=True)
-    password: Mapped[str] = mapped_column(sa.String(45))
-    numImages: Mapped[int] = mapped_column(default=0)  # image naming convention: accountImg_{{userName}}.jpg
-
+    # can access with userObject.animals.select()
+    animals: WriteOnlyMapped['animal'] = relationship(back_populates='user')
 
 
 class animal(db.Model):
@@ -52,12 +40,12 @@ class animal(db.Model):
     cats: Mapped[bool] = mapped_column(default=False)
     needsLeash: Mapped[bool] = mapped_column(default=False, nullable=True)
 
-    idPublicAccount: Mapped[int] = mapped_column(sa.ForeignKey(publicAccount.id), index=True, nullable=True)
+    iduser: Mapped[int] = mapped_column(sa.ForeignKey(user.id), index=True, nullable=True)
 
     newsPosts: WriteOnlyMapped['newsPost'] = relationship(back_populates='animal')
 
-    # can access related publicAccount with foreign key or with animalObject.publicAccount
-    publicAccount: Mapped['publicAccount'] = relationship(back_populates='animals')
+    # can access related user with foreign key or with animalObject.user
+    user: Mapped['user'] = relationship(back_populates='animals')
 
 
 class newsPost(db.Model):

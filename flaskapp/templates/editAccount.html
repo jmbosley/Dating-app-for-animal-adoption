@@ -4,7 +4,7 @@
 	
 	<h1>Account Page</h1>
 	{% for account in results %}
-	{% set account = account['publicAccount'] %}
+	{% set account = account['user'] %}
 
     <form method="POST" action="/accounts/{{account.id}}" enctype="multipart/form-data">
 	{{ form.hidden_tag() }} <!-- add CRSF token -->

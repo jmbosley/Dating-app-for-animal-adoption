@@ -4,7 +4,7 @@
 	
 	<h1>Account Page</h1>
 	{% for account in results %}
-	{% set account = account['publicAccount'] %}
+	{% set account = account['user'] %}
 	
 	<div class="split">
 			<div class="header">
@@ -17,9 +17,9 @@
 
 			<div class="text">
 				<p>
-				userName: {{account.userName}}<br>
-				email: {{account.email}} <br>
-				Phone Number: {{ account.phoneNumber}}<br>
+				<b>userName: </b>{{account.userName}}<br>
+				<b>email: </b>{{account.email}} <br>
+				<b>Phone Number: </b>{{ account.phoneNumber}}<br>
 				</p>
 			</div>
 

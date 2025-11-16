@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<body>
+	
+	<h1>Accounts</h1>
+
+    <table>
+  <thead>
+    <tr>
+        <th>id</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>userName</th>
+        <th>email</th>
+        <th>Phone Number</th>
+        <th>admin?</th>
+        <th>Change Admin?</th>
+        <th>Delete Account?</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for account in results %}
+	{% set account = account['user'] %}
+    <tr>
+        <td>{{ account.id }}</td>
+        <td>{{account.firstName}}</td>
+        <td>{{account.lastName}}</td>
+        <td>{{account.userName}}</td>
+        <td>{{account.email}}</td>
+        <td>{{account.phoneNumber}}</td>
+        <td>{{account.admin}}</td>
+        <td>
+
+		    <a href="/changeadmin/{{account.id}}" class="btn btn-secondary">Change Admin Permission</a>
+        </td>
+        <td>
+	        <a href="/delete/{{account.id}}" class="btn btn-secondary">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+
+
+    
+			
+
+
+</body>
+{% endblock %}

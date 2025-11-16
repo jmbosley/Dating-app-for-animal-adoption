@@ -4,7 +4,7 @@ from wtforms import (StringField, PasswordField, SubmitField, BooleanField, Mult
                      DateField, SelectField, TextAreaField, IntegerField, FileField)
 from wtforms.validators import DataRequired, Optional, Length, Email, EqualTo, ValidationError
 from flask_wtf.file import FileAllowed, FileRequired
-from flaskapp.models import publicAccount, adminAccount, animal, newsPost
+from flaskapp.models import user, animal, newsPost
 
 
 ANIMAL_TYPES = ["Dog", "Cat", "Bird", "Bunny", "Ferret", "Rat", "Mouse", "Chinchilla", "Other"]
@@ -23,13 +23,13 @@ def validateImages(form, field):
 
 
 def validate_email(self, email):
-    user = publicAccount.query.filter_by(email=email.data).first()
-    if user:
+    useraccount = user.query.filter_by(email=email.data).first()
+    if useraccount:
         raise ValidationError('email already exists')
 
 def validate_username(self, userName):
-    user = publicAccount.query.filter_by(userName=userName.data).first()
-    if user:
+    useraccount = user.query.filter_by(userName=userName.data).first()
+    if useraccount:
         raise ValidationError('userName already exists')
 
 def coerceIntSelect(input):
@@ -64,7 +64,7 @@ class editAnimalForm(FlaskForm):
     # field = fieldType('labelname', validators=[])
     availability = SelectField('Availability', validators=[Optional()], choices=AVAILABILITY_TYPES)
     # coerce is passed a function it inputs the selected value into.
-    idPublicAccount = SelectField('Owner', validators=[Optional()], choices=[], coerce=coerceIntSelect)
+    iduser = SelectField('Owner', validators=[Optional()], choices=[], coerce=coerceIntSelect)
 
     name = StringField('Name', validators=[Optional(), Length(min=1, max=45)])
     birthday = DateField('Birthday', validators=[Optional()])
