@@ -3,7 +3,7 @@ import os
 from flask import render_template, request, redirect, url_for, flash
 from flaskapp import app  # importing the flask app from our package defined in __init__.py
 from flaskapp import db
-from flaskapp.models import publicAccount, adminAccount, animal, newsPost
+from flaskapp.models import user, animal, newsPost
 import sqlalchemy as sa
 from sqlalchemy import inspect, func
 from flaskapp.forms import createAnimalForm, updateAccountForm, createAccountForm, deleteButton, editAnimalForm
@@ -68,10 +68,10 @@ def root():
 
 
 # -------------------------------------------------------- Public Account
-def saveAccountImages(images, publicAccount):
+def saveAccountImages(images, user):
     # delete old images
-    for img in range(0, publicAccount.numImages):
-        old_filename = f"accountImg_{publicAccount.userName}_{img}.jpg"
+    for img in range(0, user.numImages):
+        old_filename = f"accountImg_{user.userName}_{img}.jpg"
         old_filepath = os.path.join(app.root_path, "static/images/user_images", old_filename)
         if os.path.exists(old_filepath):
             os.remove(old_filepath)
@@ -88,7 +88,7 @@ def saveAccountImages(images, publicAccount):
             curr_img = curr_img.convert('RGB')
             file_extension = '.jpg'
 
-        new_filename = f"accountImg_{publicAccount.userName}{file_extension}"
+        new_filename = f"accountImg_{user.userName}{file_extension}"
         new_filepath = os.path.join(app.root_path, "static/images/user_images", new_filename)
 
         curr_img.save(new_filepath)
@@ -96,7 +96,7 @@ def saveAccountImages(images, publicAccount):
 
 # Create Public Account
 @app.route('/' + ACCOUNTS, methods=['GET', 'POST'])
-def createPublicAccount():
+def createuser():
     form = createAccountForm()
 
     if request.method == 'GET':
@@ -106,8 +106,7 @@ def createPublicAccount():
     if request.method == 'POST':  # add Account
         if form.validate_on_submit():
             content = form.data
-            # check if minimum info was provided
-            new_account = publicAccount(
+            new_account = user(
                                 firstName=content.get('firstName'),
                                 lastName=content.get('lastName'),
                                 userName=content.get('userName'),
@@ -115,6 +114,7 @@ def createPublicAccount():
                                 email=content.get('email'),
                                 phoneNumber=content.get('phoneNumber'),
                                 numImages=0,
+                                admin=False
                                 )
 
             db.session.add(new_account)  # INSERT
@@ -125,7 +125,7 @@ def createPublicAccount():
             # add pictures
             if num_images != 0 and content['images'][0].filename != '':
                 saveAccountImages(content['images'], new_account)
-                query = sa.update(publicAccount).where(publicAccount.id == new_account.id).values({'numImages': num_images})
+                query = sa.update(user).where(user.id == new_account.id).values({'numImages': num_images})
                 db.session.execute(query)
                 db.session.commit()
 
@@ -135,17 +135,17 @@ def createPublicAccount():
 
 
 @app.route('/' + ACCOUNTS + '/<int:id>', methods=['GET', 'DELETE', 'PUT', 'POST'])
-def PublicAccountFunctions(id):
+def userFunctions(id):
     form = updateAccountForm()
 
     if request.method == 'GET':  # display page
-        query = sa.select(publicAccount).where(publicAccount.id == id)
+        query = sa.select(user).where(user.id == id)
         accounts = db.session.execute(query).mappings().all()
         if accounts is None:
             return ERROR_NOT_FOUND_ACC, 404
         return render_template("account.html", title="My Account", results=accounts), 200
     if request.method == 'DELETE':
-        query = sa.delete(publicAccount).where(publicAccount.id == id)
+        query = sa.delete(user).where(user.id == id)
         db.session.execute(query)
         db.session.commit()
         return ('', 204)
@@ -155,30 +155,30 @@ def PublicAccountFunctions(id):
         curr_method = request.form["_method"]
         if curr_method == "PUT":
             if form.firstName.data:
-                query = sa.update(publicAccount).where(publicAccount.id == id).values(firstName=content['firstName'])
+                query = sa.update(user).where(user.id == id).values(firstName=content['firstName'])
                 db.session.execute(query)
                 db.session.commit()
             if form.lastName.data:
-                query = sa.update(publicAccount).where(publicAccount.id == id).values(lastName=content['lastName'])
+                query = sa.update(user).where(user.id == id).values(lastName=content['lastName'])
                 db.session.execute(query)
                 db.session.commit()
             if form.email.data:
-                query = sa.update(publicAccount).where(publicAccount.id == id).values(email=content['email'])
+                query = sa.update(user).where(user.id == id).values(email=content['email'])
                 db.session.execute(query)
                 db.session.commit()
             if form.phoneNumber.data:
-                query = sa.update(publicAccount).where(publicAccount.id == id).values(phoneNumber=content['phoneNumber'])
+                query = sa.update(user).where(user.id == id).values(phoneNumber=content['phoneNumber'])
                 db.session.execute(query)
                 db.session.commit()
 
-            query = sa.select(publicAccount).where(publicAccount.id == id)
+            query = sa.select(user).where(user.id == id)
             accounts = db.session.execute(query).scalars().one()
 
             num_images = len(content.get('images', []))
             # add pictures
             if num_images != 0 and content['images'][0].filename != '':
                 saveAccountImages(content['images'], accounts)
-                query = sa.update(publicAccount).where(publicAccount.id == accounts.id).values({'numImages': num_images})
+                query = sa.update(user).where(user.id == accounts.id).values({'numImages': num_images})
                 db.session.execute(query)
                 db.session.commit()
             return redirect('/' + ACCOUNTS + '/' + str(id))
@@ -187,73 +187,50 @@ def PublicAccountFunctions(id):
 
 
 @app.route('/' + "edit/" + ACCOUNTS + '/<int:id>', methods=['GET'])
-def PublicAccountEdit(id):
+def userEdit(id):
     form = updateAccountForm()
 
     if request.method == 'GET':  # display page
-        query = sa.select(publicAccount).where(publicAccount.id == id)
+        query = sa.select(user).where(user.id == id)
         accounts = db.session.execute(query).mappings().all()
         if accounts is None:
             return ERROR_NOT_FOUND_ACC, 404
         return render_template("editAccount.html", title="My Account", results=accounts, form=form), 200
 
-# -------------------------------------------------------- Admin Account
-
-# Create Admin Account
-@app.route('/' + ADMINS, methods=['POST'])
-def createAdminAccount():
-    if request.method == 'POST':  # add account
-        content = request.get_json()
-        # check if minimum info was provided
-        if not (set(MIN_ACCOUNT).issubset(content)):
-            return ERROR_MISSING_VALUE, 400
-        new_account = adminAccount(firstName=content.get('firstName'),
-                                   lastName=content.get('lastName'),
-                                   email=content.get('email'),
-                                   phoneNumber=content.get('phoneNumber'),
-                                   password=content.get('password'))
-        db.session.add(new_account)  # INSERT
-        db.session.commit()
-        return "Account was successfully created!", 201
-
-
-@app.route('/' + ADMINS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
-def AdminAccountFunctions(id):
+# -------------------------------------------------------- Admin Pages
+@app.route('/' + 'view' + ACCOUNTS, methods=['GET'])
+def displayAccounts():
     if request.method == 'GET':  # display page
-        query = sa.select(adminAccount).where(adminAccount.id == id)
+        query = sa.select(user)
         accounts = db.session.execute(query).mappings().all()
         if accounts is None:
             return ERROR_NOT_FOUND_ACC, 404
-        return render_template("administratoraccount.html", title="Admin Account", results=accounts), 200
-    if request.method == 'DELETE':
-        query = sa.delete(adminAccount).where(adminAccount.id == id)
+        return render_template("viewAccounts.html", title="My Account", results=accounts), 200
+
+
+@app.route('/' + 'delete' + '/<int:id>', methods=['GET'])
+def deleteUser(id):
+    query = sa.delete(user).where(user.id == id)
+    db.session.execute(query)
+    db.session.commit()
+    return redirect(url_for('displayAccounts'))
+
+
+@app.route('/' + 'changeadmin' + '/<int:id>', methods=['GET'])
+def changeAdmin(id):
+    query = sa.select(user).where(user.id == id)
+    adminValue = db.session.execute(query).mappings().all()[0]['user'].admin
+    if adminValue:
+        query = sa.update(user).where(user.id == id).values(admin=False)
         db.session.execute(query)
         db.session.commit()
-        return ('', 204)
-    if request.method == 'PUT':
-        content = request.get_json()
-        if 'firstName' in content:
-            query = sa.update(adminAccount).where(adminAccount.id == id).values(firstName=content['firstName'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'lastName' in content:
-            query = sa.update(adminAccount).where(adminAccount.id == id).values(lastName=content['lastName'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'email' in content:
-            query = sa.update(adminAccount).where(adminAccount.id == id).values(email=content['email'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'phoneNumber' in content:
-            query = sa.update(adminAccount).where(adminAccount.id == id).values(phoneNumber=content['phoneNumber'])
-            db.session.execute(query)
-            db.session.commit()
-        if 'password' in content:
-            query = sa.update(adminAccount).where(adminAccount.id == id).values(password=content['password'])
-            db.session.execute(query)
-            db.session.commit()
+        return redirect(url_for('displayAccounts'))
+    else:
+        query = sa.update(user).where(user.id == id).values(admin=True)
+        db.session.execute(query)
+        db.session.commit()
+        return redirect(url_for('displayAccounts'))
 
-        return "Account was successfully updated!", 201
 
 
 # -------------------------------------------------------- Animal
@@ -302,16 +279,16 @@ def saveImages(images, animal):
 
 def accountChoices():
     """
-    Generates publicAccount choices for edit animal form
+    Generates user choices for edit animal form
     """
-    # select all publicAccounts id and userName. ordered alphabetically by userName
+    # select all users id and userName. ordered alphabetically by userName
     # https://stackoverflow.com/a/16573690
-    query = sa.select(publicAccount.id, publicAccount.userName).order_by(func.lower(publicAccount.userName))
+    query = sa.select(user.id, user.userName).order_by(func.lower(user.userName))
     all_accounts = db.session.execute(query).mappings().all()
     accountList = [(None, "None")]
-    for user in all_accounts:
+    for account in all_accounts:
         # https://rtjom.com/blog/2016/10/using-wtforms-with-selectfield-and-fieldlist/
-        accountList.append((user["id"], user["userName"]))
+        accountList.append((account["id"], account["userName"]))
     return accountList
 
 
@@ -342,12 +319,12 @@ def createAnimal():
                             dogs=content.get('dogs'),
                             cats=content.get('cats'),
                             needsLeash=content.get('needsLeash'),
-                            idPublicAccount=content.get('idPublicAccount')
+                            iduser=content.get('iduser')
                             )
 
-        # check if publicAccount exists. probably won't be provided during creation
-        if content.get('idPublicAccount') is not None:
-            if entityExists(publicAccount, content.get('idPublicAccount')) is False:
+        # check if user exists. probably won't be provided during creation
+        if content.get('iduser') is not None:
+            if entityExists(user, content.get('iduser')) is False:
                 return ERROR_NOT_FOUND_ACC, 400
 
         # add now because we need the primary key for image naming
@@ -413,16 +390,16 @@ def animalFunctions(id):
         if curr_method == 'PUT':
             form = edit_form
             # update dynamic choices
-            form.idPublicAccount.choices = accountChoices()
+            form.iduser.choices = accountChoices()
             content = form.data
 
             if form.validate_on_submit() is False:
                 # print(form.errors.items())
                 return redirect('/' + "edit/" + ANIMALS + '/' + str(id))
 
-            if content.get('idPublicAccount'): # if not falsy: "" or None
-                # check if publicAccount exists if one was provided
-                if entityExists(publicAccount, content.get('idPublicAccount')) is False:
+            if content.get('iduser'): # if not falsy: "" or None
+                # check if user exists if one was provided
+                if entityExists(user, content.get('iduser')) is False:
                     return ERROR_NOT_FOUND_ACC, 400
 
             updateEntity(animal, content, id)
@@ -455,7 +432,7 @@ def AnimalEdit(id):
             return ERROR_NOT_FOUND_ANIMAL, 404
         curr_animal = curr_animal[0]['animal']
 
-        form.idPublicAccount.choices = accountChoices()
+        form.iduser.choices = accountChoices()
         prefillEditForm(form, curr_animal)
 
         return render_template("editAnimal.html", title="Edit Animal", curr_animal=curr_animal, form=form), 200
