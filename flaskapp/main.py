@@ -286,9 +286,9 @@ def accountChoices():
     query = sa.select(user.id, user.userName).order_by(func.lower(user.userName))
     all_accounts = db.session.execute(query).mappings().all()
     accountList = [(None, "None")]
-    for user in all_accounts:
+    for account in all_accounts:
         # https://rtjom.com/blog/2016/10/using-wtforms-with-selectfield-and-fieldlist/
-        accountList.append((user["id"], user["userName"]))
+        accountList.append((account["id"], account["userName"]))
     return accountList
 
 
