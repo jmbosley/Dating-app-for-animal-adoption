@@ -80,7 +80,8 @@
 
 
 		<div class="options">
-			{% if 1 == 1 %} <!-- placeholder for admin restriction -->
+			{% if current_user.is_authenticated and current_user.admin %}
+			<!-- Only show edit/delete options to admins -->
 			<form id="animalOptions" action="/animals/{{result.id}}" method="POST" enctype="multipart/form-data">
 				{{ form.hidden_tag() }}
 				<input type="hidden" name="_method" value="DELETE">

@@ -1,20 +1,28 @@
-from flaskapp import db
+from flaskapp import db, login_manager
 from datetime import date
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, WriteOnlyMapped, mapped_column, relationship
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
+#flask login user loader callback
+@login_manager.user_loader
+def load_user(user_id):
+    return user.query.get(int(user_id))
 
 
 # create a new model
 # optional read: https://www.geeksforgeeks.org/python/sqlalchemy-orm-declaring-mapping/
 # https://stackoverflow.com/questions/76498857/what-is-the-difference-between-mapped-column-and-column-in-sqlalchemy
-class user(db.Model):
+class user(UserMixin, db.Model):
     __tablename__ = 'users'
     # attributeName: typehint = mapped_column(sql specifications)
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     firstName: Mapped[str] = mapped_column(sa.String(45))
     lastName: Mapped[str] = mapped_column(sa.String(45))
     userName: Mapped[str] = mapped_column(sa.String(45))
-    email: Mapped[str] = mapped_column(sa.String(45))  # can set unique=true later (off for easier debugging)
+    email: Mapped[str] = mapped_column(sa.String(45))  # can set unique=true later
     phoneNumber: Mapped[str] = mapped_column(sa.String(45), nullable=True)  # no default specified: default NULL
     password: Mapped[str] = mapped_column(sa.String(45))
     numImages: Mapped[int] = mapped_column(default=0)  # image naming convention: accountImg_{{userName}}.jpg
@@ -22,6 +30,20 @@ class user(db.Model):
 
     # can access with userObject.animals.select()
     animals: WriteOnlyMapped['animal'] = relationship(back_populates='user')
+
+    #password methods for backwards compatibility
+    def set_password(self, plain_password):
+        """stores plain password for compatibility"""
+        self.password = plain_password
+    
+    def check_password(self, plain_password):
+        """Checks if provided password matches stored password"""
+        return self.password == plain_password
+    
+    #additional helper methods
+    def is_admin(self):
+        """checks if user has admin privileges"""
+        return self.admin == True
 
 
 class animal(db.Model):

@@ -11,7 +11,6 @@ ANIMAL_TYPES = ["Dog", "Cat", "Bird", "Bunny", "Ferret", "Rat", "Mouse", "Chinch
 AVAILABILITY_TYPES = ["Available", "Not Available", "Pending", "Adopted"]
 
 
-
 def validateImages(form, field):
     # https://wtforms.readthedocs.io/en/2.3.x/validators/
     for file in field.data:
@@ -36,6 +35,14 @@ def coerceIntSelect(input):
     if input in ["None", None]:  # SelectFields will convert None to str, convert back
         return None
     return int(input)
+
+
+class LoginForm(FlaskForm):
+    """Form for user login"""
+    userName = StringField('Username', validators=[DataRequired(), Length(min=1, max=45)])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Log In')
 
 
 class createAnimalForm(FlaskForm):
@@ -99,6 +106,8 @@ class createAccountForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     email = StringField('email', validators=[DataRequired(), Length(min=1, max=45)])
     phoneNumber = StringField('phoneNumber', validators=[DataRequired(), Length(min=1, max=45)])
+    # Admin checkbox - only shown to admins
+    admin = BooleanField('Admin Account', default=False)
     images = MultipleFileField('Add some Images', validators=[validateImages, Optional()])
     submit = SubmitField('Submit')
 
