@@ -22,7 +22,7 @@ class user(UserMixin, db.Model):
     firstName: Mapped[str] = mapped_column(sa.String(45))
     lastName: Mapped[str] = mapped_column(sa.String(45))
     userName: Mapped[str] = mapped_column(sa.String(45))
-    email: Mapped[str] = mapped_column(sa.String(45))  # can set unique=true later
+    email: Mapped[str] = mapped_column(sa.String(45))  # can set unique=true later (off for easier debugging)
     phoneNumber: Mapped[str] = mapped_column(sa.String(45), nullable=True)  # no default specified: default NULL
     password: Mapped[str] = mapped_column(sa.String(45))
     numImages: Mapped[int] = mapped_column(default=0)  # image naming convention: accountImg_{{userName}}.jpg

@@ -232,6 +232,7 @@ def userFunctions(id):
         return ('', 204)
     if request.method == 'POST':
         content = form.data
+        print(content)
         curr_method = request.form["_method"]
         if curr_method == "PUT":
             if form.firstName.data:
@@ -283,7 +284,7 @@ def userEdit(id):
         accounts = db.session.execute(query).mappings().all()
         if accounts is None:
             return ERROR_NOT_FOUND_ACC, 404
-        return render_template("editAccount.html", title="Edit Account", results=accounts, form=form), 200
+        return render_template("editAccount.html", title="My Account", results=accounts, form=form), 200
 
 
 # -------------------------------------------------------- Admin Pages
