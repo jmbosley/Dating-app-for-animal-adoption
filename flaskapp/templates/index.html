@@ -1,25 +1,99 @@
-<!doctype html>
-<!--
- Copyright 2021 Google LLC
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
-
 {% extends "base.html" %}
 {% block content %}
-<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2 class="hero-title">Find Your Perfect Pet/Companion</h2>
+                <p class="hero-subtitle">Browse through shelter animals looking for their forever home!</p>
+                <div class="hero-actions">
+                    <a href="#about" class="btn btn-secondary btn-large">Tell Me More</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="placeholder-image">
+                    <img src="{{ url_for('static', filename='images/animalImages/placeholderAnimal.jpg') }}" alt="Featured adoptable pet" class="featured-pet-image">
+                </div>
+            </div>
+        </div>
+    </section>
 
-	<h2>Welcome</h2>
+    <!--  About -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">About Our Site</h2>
+            <div class="about-content">
+                <p>This Animal Adoption Dating Site aims to streamline the process of connecting prospective adopters with suitable animals. It will provide clear and comprehensive information, including disposition, availability, breed, and other relevant details, to ensure all important factors are considered prior to adoption. This benefits both the users and the animals.</p>
+            </div>
+        </div>
+    </section>
 
-</body>
+    <!-- Features  -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="{{ url_for('static', filename='images/search-icon.svg') }}" alt="Browse" class="feature-icon-image" onerror="this.style.display='none'">
+                    </div>
+                    <h3>Browse Profiles</h3>
+                    <p>Search through pictures and profiles of animals available for adoption</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="{{ url_for('static', filename='images/match-icon.svg') }}" alt="Filter" class="feature-icon-image" onerror="this.style.display='none'">
+                    </div>
+                    <h3>Find Your Match</h3>
+                    <p>Filter by breed, disposition, time in shelter, lifestyle compatibility, we have it all!</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="{{ url_for('static', filename='images/adopt-icon.svg') }}" alt="Connect" class="feature-icon-image" onerror="this.style.display='none'">
+                    </div>
+                    <h3>Adopt with Confidence</h3>
+                    <p>Get all the information you need to make the perfect match. Then connect with the animal shelter to meet your new companion!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Feed -->
+    <section class="news-feed">
+        <div class="container">
+            <h2 class="section-title">Latest News + Updates</h2>
+            <div id="newsContainer" class="news-grid">
+                <div class="loading">Loading news...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Animal Adoption Dating Site. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (mobileMenu) {
+            mobileMenu.classList.toggle('show');
+        }
+    }
+
+    // Load news items (placeholder for now)
+    document.addEventListener('DOMContentLoaded', function() {
+        // This would normally load news from your backend
+        const newsContainer = document.getElementById('newsContainer');
+        if (newsContainer) {
+            // For now, just remove the loading message after a delay
+            setTimeout(() => {
+                newsContainer.innerHTML = '<p style="text-align: center; color: #666;">No news items at this time.</p>';
+            }, 1000);
+        }
+    });
+    </script>
 {% endblock %}

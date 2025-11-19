@@ -1,13 +1,16 @@
 # routes
 import os
 from flask import render_template, request, redirect, url_for, flash
-from flaskapp import app  # importing the flask app from our package defined in __init__.py
+from flaskapp import app, login_manager  # importing the flask app from our package defined in __init__.py
 from flaskapp import db
 from flaskapp.models import user, animal, newsPost
 import sqlalchemy as sa
 from sqlalchemy import inspect, func
-from flaskapp.forms import createAnimalForm, updateAccountForm, createAccountForm, deleteButton, editAnimalForm
+from flaskapp.forms import (createAnimalForm, updateAccountForm, createAccountForm, 
+                           deleteButton, editAnimalForm, LoginForm)
 from PIL import Image
+from flask_login import login_user, logout_user, login_required, current_user
+from functools import wraps
 
 
 ACCOUNTS = "accounts"
@@ -23,6 +26,19 @@ ERROR_MISSING_VALUE = "Not all required values were provided"
 ERROR_NOT_FOUND_ACC = "The requested account was not found"
 ERROR_NOT_FOUND_ANIMAL = "The requested animal was not found"
 ERROR_NOT_FOUND_NEWSPOST = "The requested news post was not found"
+ERROR_UNAUTHORIZED = "You are not authorized to perform this action"
+
+
+#admin required decorator
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.admin:
+            flash('You need to be an admin to access this page.', 'danger')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 def entityExists(model_type, id):
     """
@@ -62,12 +78,61 @@ def prefillEditForm(form, entity):
             continue
     form.process()
 
+
+# -------------------------------------------------------- Authentication Routes
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('root'))
+    
+    form = LoginForm()
+    if form.validate_on_submit():
+        #find user by username
+        user_obj = user.query.filter_by(userName=form.userName.data).first()
+        
+        if user_obj is None:
+            flash('Invalid username or password', 'danger')
+            return redirect(url_for('login'))
+        
+        #check password using the existing password field (plain text for now)
+        if user_obj.password != form.password.data:
+            flash('Invalid username or password', 'danger')
+            return redirect(url_for('login'))
+        
+        #Log  user in
+        login_user(user_obj, remember=form.remember.data)
+        
+        #flash different messages based on admin status so you can tell if you are admin
+        if user_obj.admin:
+            flash(f'Welcome back, Admin {user_obj.firstName}!', 'success')
+        else:
+            flash(f'Welcome back, {user_obj.firstName}!', 'success')
+        
+        # redirect to next page or home
+        next_page = request.args.get('next')
+        return redirect(next_page) if next_page else redirect(url_for('root'))
+    
+    return render_template('login.html', title='Login', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out successfully.', 'info')
+    return redirect(url_for('root'))
+
+
+# -------------------------------------------------------- Public Routes
+
 @app.route("/")
 def root():
-    return render_template("index.html", title="Front end not yet implemented")
+    return render_template("index.html", title="Animal Adoption Dating Site")
 
 
 # -------------------------------------------------------- Public Account
+
 def saveAccountImages(images, user):
     # delete old images
     for img in range(0, user.numImages):
@@ -94,13 +159,14 @@ def saveAccountImages(images, user):
         curr_img.save(new_filepath)
     return
 
+
 # Create Public Account
 @app.route('/' + ACCOUNTS, methods=['GET', 'POST'])
 def createuser():
     form = createAccountForm()
 
     if request.method == 'GET':
-
+        
         return render_template('createAccount.html', title='Create Account', form=form)
 
     if request.method == 'POST':  # add Account
@@ -110,7 +176,7 @@ def createuser():
                                 firstName=content.get('firstName'),
                                 lastName=content.get('lastName'),
                                 userName=content.get('userName'),
-                                password=content.get('password'),
+                                password=content.get('password'),  # Using plain password field for now
                                 email=content.get('email'),
                                 phoneNumber=content.get('phoneNumber'),
                                 numImages=0,
@@ -129,14 +195,26 @@ def createuser():
                 db.session.execute(query)
                 db.session.commit()
 
+            flash('Account created successfully!', 'success')
+            
+            # Auto-login if not already logged in
+            if not current_user.is_authenticated:
+                login_user(new_account)
+                
             return redirect('/' + ACCOUNTS + '/' + str(new_account.id))
         else:
             return render_template('createAccount.html', title='Create Account', form=form)
 
 
 @app.route('/' + ACCOUNTS + '/<int:id>', methods=['GET', 'DELETE', 'PUT', 'POST'])
+@login_required
 def userFunctions(id):
     form = updateAccountForm()
+    
+    # Check if user can access this account (own account or admin)
+    if current_user.id != id and not current_user.admin:
+        flash('You can only view/edit your own account.', 'danger')
+        return redirect(url_for('userFunctions', id=current_user.id))
 
     if request.method == 'GET':  # display page
         query = sa.select(user).where(user.id == id)
@@ -145,6 +223,9 @@ def userFunctions(id):
             return ERROR_NOT_FOUND_ACC, 404
         return render_template("account.html", title="My Account", results=accounts), 200
     if request.method == 'DELETE':
+        # Only admin can delete accounts
+        if not current_user.admin:
+            return ERROR_UNAUTHORIZED, 403
         query = sa.delete(user).where(user.id == id)
         db.session.execute(query)
         db.session.commit()
@@ -181,13 +262,21 @@ def userFunctions(id):
                 query = sa.update(user).where(user.id == accounts.id).values({'numImages': num_images})
                 db.session.execute(query)
                 db.session.commit()
+            
+            flash('Account updated successfully!', 'success')
             return redirect('/' + ACCOUNTS + '/' + str(id))
         else:
             return ERROR_FORM
 
 
 @app.route('/' + "edit/" + ACCOUNTS + '/<int:id>', methods=['GET'])
+@login_required
 def userEdit(id):
+    #checks if user can edit this account (own account or admin)
+    if current_user.id != id and not current_user.admin:
+        flash('You can only edit your own account.', 'danger')
+        return redirect(url_for('userFunctions', id=current_user.id))
+    
     form = updateAccountForm()
 
     if request.method == 'GET':  # display page
@@ -196,6 +285,7 @@ def userEdit(id):
         if accounts is None:
             return ERROR_NOT_FOUND_ACC, 404
         return render_template("editAccount.html", title="My Account", results=accounts, form=form), 200
+
 
 # -------------------------------------------------------- Admin Pages
 @app.route('/' + 'view' + ACCOUNTS, methods=['GET'])
@@ -492,3 +582,10 @@ def newsPostFunctions(id):
         updateEntity(newsPost, content, id)
 
         return "News post was successfully updated!", 201
+
+
+
+# Context processor to make current_user available in all templates
+@app.context_processor
+def inject_user():
+    return dict(current_user=current_user)

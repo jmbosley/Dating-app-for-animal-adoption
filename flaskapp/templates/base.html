@@ -15,23 +15,43 @@ The content of other pages is inserted into block content.
 </head>
 
 <body>
-        <!-- Navigation Header -->
+    <!-- flash messages for log in/log out-->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Navigation Header -->
     <header class="navbar">
         <div class="container">
             <div class="nav-brand">
                 <h1>Animal Adoption Dating Site</h1>
             </div>
             <nav class="nav-menu">
-                <!-- TODO: Replace these hrefs with actual login and create account page URLs -->
-                <a href="/login" class="btn btn-secondary">Log In</a>
-                <a href="/accounts" class="btn btn-primary">Create Account</a>
+                {% if current_user.is_authenticated %}
+                    <span class="welcome-text">
+                            Welcome, {{ current_user.firstName }}!
+                    </span>
+                    <a href="/accounts/{{ current_user.id }}" class="btn btn-secondary">My Account</a>
+                    <a href="/logout" class="btn btn-primary">Log Out</a>
+                {% else %}
+                    <a href="/login" class="btn btn-secondary">Log In</a>
+                    <a href="/accounts" class="btn btn-primary">Create Account</a>
+                {% endif %}
             </nav>
         </div>
     </header>
 
     <nav class="nav-site">
-        <a href="/" >Home</a>
-        <a href="/" >Browse</a>
+        <a href="/">Home</a>
+        <a href="/">Browse Animals</a>
         <!-- TODO: Make Below only Viewable from Admin Account -->
         <a href="/viewaccounts">View Accounts</a>
     </nav>   
@@ -39,5 +59,45 @@ The content of other pages is inserted into block content.
     <main>
         {% block content %}{% endblock %}
     </main>
+
+    <!-- CSS for flash messages -->
+    <style>
+        .flash-messages {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 10px 10px;
+        }
+        .alert {
+            padding: 10px 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border: 5px solid transparent;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+            color: #856404;
+        }
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        .welcome-text {
+            padding: 1rem 1rem;
+            color: var(--accent1);
+            font-weight: 1000;
+        }
+    </style>
 </body>
 </html>
