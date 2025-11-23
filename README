@@ -75,3 +75,14 @@ Citation for animal.html, style.css:
 Date: 11/11/2025
 The image slideshow is heavily based on the example in this link:
 https://www.w3schools.com/howto/howto_js_slideshow.asp
+
+Citation for flaskapp:
+Date: 11/23/2025
+To make foreign key constraints work, I used the solution provided here:
+https://stackoverflow.com/a/63144511
+
+
+Citation for animal forms:
+Date: 11/23/2025
+I referenced this solution when making dynamic selects:
+https://stackoverflow.com/a/58881664

@@ -7,7 +7,10 @@ from flask_wtf.file import FileAllowed, FileRequired
 from flaskapp.models import user, animal, newsPost
 
 
-ANIMAL_TYPES = ["Dog", "Cat", "Bird", "Bunny", "Ferret", "Rat", "Mouse", "Chinchilla", "Other"]
+ANIMAL_TYPES = ["Dog", "Cat", "Other"]
+DOG_BREEDS = ["dog1", "dog2"]
+CAT_BREEDS = ["cat1", "cat2"]
+OTHER_BREEDS = ["others"]
 AVAILABILITY_TYPES = ["Available", "Not Available", "Pending", "Adopted"]
 
 
@@ -51,8 +54,13 @@ class createAnimalForm(FlaskForm):
 
     name = StringField('Name', validators=[DataRequired(), Length(min=1, max=45)])
     birthday = DateField('Birthday', validators=[Optional()])
-    type = SelectField('Type', validators=[DataRequired()], choices=ANIMAL_TYPES)
+    type = SelectField('Type', validators=[DataRequired()], choices=ANIMAL_TYPES, render_kw={'onchange': "breedDisplay()"})
     breed = StringField('Breed', validators=[Optional(), Length(min=0, max=45)])
+
+    breedDog = SelectField('Breed', validators=[Optional()], choices=DOG_BREEDS)
+    breedCat = SelectField('Breed', validators=[Optional()], choices=CAT_BREEDS)
+    breedOther = SelectField('Breed', validators=[Optional()], choices=OTHER_BREEDS)
+
     description = TextAreaField('Description', validators=[Optional(), Length(min=0, max=1000)])
 
     children = BooleanField('Good with Children', default=True)
@@ -61,8 +69,6 @@ class createAnimalForm(FlaskForm):
     needsLeash = BooleanField('Must be leashed at all times', default=False)
 
     images = MultipleFileField('Add some Images', validators=[validateImages, Optional()])
-
-    createNewsPost = BooleanField('Create a news post about this animal\'s arrival', default=False)
 
     submit = SubmitField('Submit')
 
@@ -86,6 +92,21 @@ class editAnimalForm(FlaskForm):
 
     images = MultipleFileField('Replace Images', validators=[validateImages, Optional()])
 
+    submit = SubmitField('Submit')
+
+
+class createNewsPostForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired(), Length(min=1, max=100)])
+    body = TextAreaField('Body', validators=[DataRequired(), Length(min=0, max=10000)])
+    idAnimal = SelectField('Related Animal', validators=[Optional()], choices=[], coerce=coerceIntSelect)
+    submit = SubmitField('Submit')
+
+
+class editNewsPostForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired(), Length(min=1, max=100)])
+    body = TextAreaField('Body', validators=[DataRequired(), Length(min=0, max=10000)])
+    datePublished = DateField('Date Published', validators=[Optional()])
+    idAnimal = SelectField('Related Animal', validators=[Optional()], choices=[], coerce=coerceIntSelect)
     submit = SubmitField('Submit')
 
 

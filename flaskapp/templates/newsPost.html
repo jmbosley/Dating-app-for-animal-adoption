@@ -1,14 +1,65 @@
 {% extends "base.html" %}
 {% block content %}
 <body>
+	<h1>{{title}}</h1>
 
-  <h1>News</h1>
+	<div class="split">
 
-	<h2>newsPosts</h2>
-	{% for post in results %}
-	{% set post = post['newsPost'] %}
-	<p>object: {{ post }}     title:{{ post.title }}    </p>
-	{% endfor %}
+		<div class="header">
+			<h2>{{ curr_newsPost.title }}</h2>
+		</div>
+
+
+	<!-- Slideshow made with help from https://www.w3schools.com/howto/howto_js_slideshow.asp -->
+		<div class = "image">
+		{% if curr_newsPost.idAnimal != None %}
+			<!-- newsPost has related animal, do normal animal img display -->
+			{% set curr_animal = curr_newsPost.animal %}
+			{% include "slideshow.html" %}
+		
+		<!-- Image for newsPost with no related animal. https://pixabay.com/vectors/newspaper-read-news-business-311272/ -->
+		{% else %}
+			<div class="slideshow-container">
+				<div class="mySlides fade">
+    				<div class="numbertext">1 / 1</div>
+					{% set image_url = 'images/defaultNewsPost.png' %}
+    				<img src="{{ url_for('static', filename=image_url) }}" alt="Image" style="max-width:100%" class="user-image">
+  				</div>
+			</div>
+		{% endif %}
+
+		</div> <!-- img section end -->
+		
+
+		<div class="text">
+			<p>
+			Post id: {{curr_newsPost.id}}<br>
+			Date Published: {{curr_newsPost.datePublished}}<br><br>
+			{{curr_newsPost.body}}
+			</p>
+		</div>
+
+
+		<div class="options">
+			<form id="newsPostOptions" action="/newsPosts/{{curr_newsPost.id}}" method="POST" enctype="multipart/form-data">
+				{{ form.hidden_tag() }}
+				<input type="hidden" name="_method" value="DELETE">
+				{{ form.delete(value="Delete News Post", onclick="return confirmNewsPostDeletion('news post')", class="btn btn-secondary") }}
+				<a href="/edit/newsPosts/{{curr_newsPost.id}}" class="btn btn-secondary">Edit News Post</a>
+				{% if curr_newsPost.idAnimal != None %}
+				<a href="/animals/{{curr_newsPost.idAnimal}}" class="btn btn-secondary">Visit Pet</a>
+				{% endif %}
+			</form>
+		</div>
+
+	</div>
+
 
 </body>
+
+<script>
+	let slideIndex = 1;
+	showSlides(slideIndex);
+</script>
+
 {% endblock %}

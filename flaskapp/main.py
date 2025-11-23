@@ -6,8 +6,8 @@ from flaskapp import db
 from flaskapp.models import user, animal, newsPost
 import sqlalchemy as sa
 from sqlalchemy import inspect, func
-from flaskapp.forms import (createAnimalForm, updateAccountForm, createAccountForm, 
-                           deleteButton, editAnimalForm, LoginForm)
+from flaskapp.forms import (createAnimalForm, updateAccountForm, createAccountForm, deleteButton,
+                             editAnimalForm, LoginForm, createNewsPostForm, editNewsPostForm)
 from PIL import Image
 from flask_login import login_user, logout_user, login_required, current_user
 from functools import wraps
@@ -394,7 +394,12 @@ def createAnimal():
         if form.validate_on_submit() is False:
             return render_template('createAnimal.html', title='Create Animal', form=form)
 
+        
+
         content = form.data
+        content['breed'] = content.get(f'breed{content.get('type')}')
+        print(content['breed'])         
+        
         # check if minimum info was provided
         if not (set(MIN_ANIMAL).issubset(content)):
             return ERROR_MISSING_VALUE, 400
@@ -430,15 +435,6 @@ def createAnimal():
             db.session.execute(query)
             db.session.commit()
 
-        # optionally create a newsPost
-        if content.get('createNewsPost') is True:
-            new_newsPost = newsPost(title=f'New Animal: {new_animal.name}',
-                                body=new_animal.description,
-                                idAnimal=new_animal.id
-                                )
-            db.session.add(new_newsPost)  # INSERT
-            db.session.commit()
-
         return redirect('/' + ANIMALS + '/' + str(new_animal.id))
 
 
@@ -454,7 +450,7 @@ def animalFunctions(id):
             return ERROR_NOT_FOUND_ANIMAL, 404
         curr_animal = animals[0]['animal']
 
-        return render_template("animal.html", title=f"Pet Profile: {curr_animal.name}", result=curr_animal, form=del_form), 200
+        return render_template("animal.html", title=f"Pet Profile: {curr_animal.name}", curr_animal=curr_animal, form=del_form), 200
 
     if request.method == 'POST':
         curr_method = request.form['_method']
@@ -530,12 +526,34 @@ def AnimalEdit(id):
 
 # -------------------------------------------------------- NewsPost
 
+def animalChoices():
+    """
+    Generates animal choices for forms
+    """
+    query = sa.select(animal.id, animal.name).order_by(animal.id)
+    all_animals = db.session.execute(query).mappings().all()
+    animalList = [(None, "None")]
+    for curr_animal in all_animals:
+        animalList.append((curr_animal["id"], f"{curr_animal['id']}: {curr_animal['name']}"))
+    return animalList
 
 # Create News Post
-@app.route('/' + NEWSPOSTS, methods=['POST'])
+@app.route('/' + NEWSPOSTS, methods=['GET', 'POST'])
 def createNewsPost():
+    form = createNewsPostForm()
+    form.idAnimal.choices = animalChoices()
+
+    if request.method == 'GET':
+        form.idAnimal.default = request.args.get('idAnimal')  # ?idAnimal=int
+        form.process()
+        return render_template('createNewsPost.html', title='Create News Post', form=form)
+
     if request.method == 'POST':  # add newsPost
-        content = request.get_json()
+        if form.validate_on_submit() is False:
+            return render_template('createAnimal.html', title='Create Animal', form=form)
+
+        content = form.data
+
         # check if minimum info was provided
         if not (set(MIN_NEWSPOST).issubset(content)):
             return ERROR_MISSING_VALUE, 400
@@ -553,35 +571,71 @@ def createNewsPost():
 
         db.session.add(new_newsPost)  # INSERT
         db.session.commit()
-        return "News post was successfully created!", 201
+        return redirect('/' + NEWSPOSTS + '/' + str(new_newsPost.id))
 
 
-@app.route('/' + NEWSPOSTS + '/<int:id>', methods=['GET', 'DELETE', 'PUT'])
+@app.route('/' + NEWSPOSTS + '/<int:id>', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def newsPostFunctions(id):
+    del_form = deleteButton()
+    edit_form = editNewsPostForm()
+    edit_form.idAnimal.choices = animalChoices()
+
+    if request.method == 'GET':  # display page
+        form = del_form
+        query = sa.select(newsPost).where(newsPost.id == id)
+        curr_newsPost = db.session.execute(query).mappings().all()
+        if curr_newsPost is None:
+            return ERROR_NOT_FOUND_NEWSPOST, 404
+        curr_newsPost = curr_newsPost[0]['newsPost']
+        return render_template("newsPost.html", title=f"News Post: {curr_newsPost.title}", curr_newsPost=curr_newsPost, form=form), 200
+
+
+    if request.method == 'POST':
+        curr_method = request.form['_method']
+
+        if curr_method == 'PUT':
+            form = edit_form
+            if form.validate_on_submit() is False:
+                return render_template('createNewsPost.html', title='Create News Post', form=form)
+
+            content = form.data
+
+            if content.get('idAnimal'): # if not falsy: "" or None
+                # check if user exists if one was provided
+                if entityExists(animal, content.get('idAnimal')) is False:
+                    return ERROR_NOT_FOUND_ANIMAL, 400
+
+            # check if minimum info was provided
+            if not (set(MIN_NEWSPOST).issubset(content)):
+                return ERROR_MISSING_VALUE, 400
+
+            updateEntity(newsPost, content, id)
+            return redirect('/' + NEWSPOSTS + '/' + str(id))
+        
+        if curr_method == 'DELETE':
+            query = sa.delete(newsPost).where(newsPost.id == id)
+            db.session.execute(query)
+            db.session.commit()
+            return redirect('/')
+            
+
+    
+@app.route('/' + "edit/" + NEWSPOSTS + '/<int:id>', methods=['GET'])
+def newsPostEdit(id):
+    form = editNewsPostForm()
+
     if request.method == 'GET':  # display page
         query = sa.select(newsPost).where(newsPost.id == id)
-        newsPosts = db.session.execute(query).mappings().all()
-        if newsPosts is None:
+        # select newsPost
+        curr_newsPost = db.session.execute(query).mappings().all()
+        if curr_newsPost is None:
             return ERROR_NOT_FOUND_NEWSPOST, 404
-        return render_template("newsPost.html", title="newsPosts", results=newsPosts), 200
+        curr_newsPost = curr_newsPost[0]['newsPost']
 
-    if request.method == 'DELETE':
-        query = sa.delete(newsPost).where(newsPost.id == id)
-        db.session.execute(query)
-        db.session.commit()
-        return ('', 204)
+        form.idAnimal.choices = animalChoices()
+        prefillEditForm(form, curr_newsPost)
 
-    if request.method == 'PUT':
-        content = request.get_json()
-
-        if content.get('idAnimal') != False:
-            # check if animal exists
-            if entityExists(animal, content.get('idAnimal')) is False:
-                return ERROR_NOT_FOUND_ANIMAL, 400
-
-        updateEntity(newsPost, content, id)
-
-        return "News post was successfully updated!", 201
+        return render_template("editNewsPost.html", title="Edit News Post", curr_newsPost=curr_newsPost, form=form), 200
 
 
 
