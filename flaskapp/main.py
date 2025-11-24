@@ -455,7 +455,7 @@ def animalFunctions(id):
         if not current_user.is_authenticated or not current_user.admin:
             flash('You need to be an admin to access this page.', 'danger')
             return redirect(url_for('login'))
-        
+   
         curr_method = request.form['_method']
 
         if curr_method == 'DELETE':
@@ -511,6 +511,7 @@ def animalFunctions(id):
 
             return redirect('/' + ANIMALS + '/' + str(id))
 
+
 @app.route('/' + "edit/" + ANIMALS + '/<int:id>', methods=['GET'])
 @admin_required
 def AnimalEdit(id):
@@ -548,6 +549,7 @@ def animalChoices():
     for curr_animal in all_animals:
         animalList.append((curr_animal["id"], f"{curr_animal['id']}: {curr_animal['name']}"))
     return animalList
+
 
 # Create News Post
 @app.route('/' + NEWSPOSTS, methods=['GET', 'POST'])
@@ -605,7 +607,6 @@ def newsPostFunctions(id):
         curr_newsPost = curr_newsPost[0]['newsPost']
         return render_template("newsPost.html", title=f"News Post: {curr_newsPost.title}", curr_newsPost=curr_newsPost, form=form), 200
 
-
     if request.method == 'POST':
         if not current_user.is_authenticated or not current_user.admin:
             flash('You need to be an admin to access this page.', 'danger')
@@ -631,15 +632,14 @@ def newsPostFunctions(id):
 
             updateEntity(newsPost, content, id)
             return redirect('/' + NEWSPOSTS + '/' + str(id))
-        
+
         if curr_method == 'DELETE':
             query = sa.delete(newsPost).where(newsPost.id == id)
             db.session.execute(query)
             db.session.commit()
-            return redirect('/')
-            
+            return redirect('/')         
 
-    
+
 @app.route('/' + "edit/" + NEWSPOSTS + '/<int:id>', methods=['GET'])
 @admin_required
 def newsPostEdit(id):
@@ -660,7 +660,6 @@ def newsPostEdit(id):
         prefillEditForm(form, curr_newsPost)
 
         return render_template("editNewsPost.html", title="Edit News Post", curr_newsPost=curr_newsPost, form=form), 200
-
 
 
 # Context processor to make current_user available in all templates

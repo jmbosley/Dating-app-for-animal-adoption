@@ -120,10 +120,11 @@
                     {{ form.submit(class="btn btn-secondary") }} 
                 </p>
 			</div>
-
+            
 	</div>
 	</form>
 </body>
+
 <script>
     let typeChoices = {{form.type.choices|tojson|safe}};
     breedDisplay( typeChoices );
