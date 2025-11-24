@@ -33,8 +33,9 @@
 
 		<div class="text">
 			<p>
-			Post id: {{curr_newsPost.id}}<br>
-			Date Published: {{curr_newsPost.datePublished}}<br><br>
+			<span class="important">Post id:</span> {{curr_newsPost.id}}<br>
+			<span class="important">Date Published:</span> {{curr_newsPost.datePublished}}<br><br>
+			<span class="important">Content:</span><br>
 			{{curr_newsPost.body}}
 			</p>
 		</div>
@@ -43,9 +44,11 @@
 		<div class="options">
 			<form id="newsPostOptions" action="/newsPosts/{{curr_newsPost.id}}" method="POST" enctype="multipart/form-data">
 				{{ form.hidden_tag() }}
+				{% if current_user.admin %}
 				<input type="hidden" name="_method" value="DELETE">
 				{{ form.delete(value="Delete News Post", onclick="return confirmNewsPostDeletion('news post')", class="btn btn-secondary") }}
 				<a href="/edit/newsPosts/{{curr_newsPost.id}}" class="btn btn-secondary">Edit News Post</a>
+				{% endif %}
 				{% if curr_newsPost.idAnimal != None %}
 				<a href="/animals/{{curr_newsPost.idAnimal}}" class="btn btn-secondary">Visit Pet</a>
 				{% endif %}

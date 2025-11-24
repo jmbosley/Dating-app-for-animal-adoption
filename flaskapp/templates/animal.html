@@ -20,9 +20,9 @@
 
 		<div class="text">
 			<p>
-			Availability: {{curr_animal.availability}}<br><br>
-			id: {{curr_animal.id}}<br>
-			Name: {{curr_animal.name}}<br>
+			<span class="important">Availability:</span> {{curr_animal.availability}}<br><br>
+			<span class="important">id:</span> {{curr_animal.id}}<br>
+			<span class="important">Name:</span> {{curr_animal.name}}<br>
 
 			{% if curr_animal.birthday == None %}
 			{% set birthday = "Unknown" %}
@@ -30,24 +30,24 @@
 			{% set birthday = curr_animal.birthday %}
 			{% endif %}
 
-			Birthday: {{birthday}}<br>
-			Type: {{curr_animal.type}}<br>
-			Breed: {{curr_animal.breed}}<br><br>
+			<span class="important">Birthday:</span> {{birthday}}<br>
+			<span class="important">Type:</span> {{curr_animal.type}}<br>
+			<span class="important">Breed:</span> {{curr_animal.breed}}<br><br>
 
-			Good with:<br>
-			Children: {{curr_animal.children}}<br>
-			Dogs: {{curr_animal.dogs}}<br>
-			Cats: {{curr_animal.cats}}<br><br>
-			Must be leashed at all times: {{curr_animal.needsLeash}}<br><br>
+			<span class="important">Good with:</span><br>
+			<span class="important">Children:</span> {{curr_animal.children}}<br>
+			<span class="important">Dogs:</span> {{curr_animal.dogs}}<br>
+			<span class="important">Cats:</span> {{curr_animal.cats}}<br><br>
+			<span class="important">Must be leashed at all times:</span> {{curr_animal.needsLeash}}<br><br>
 
-			Description:<br>
+			<span class="important">Description:</span><br>
 			{{curr_animal.description}}
 			</p>
 		</div>
 
 
 		<div class="options">
-			{% if 1 == 1 %} <!-- placeholder for admin restriction -->
+			{% if current_user.admin %} <!-- placeholder for admin restriction -->
 			<form id="animalOptions" action="/animals/{{curr_animal.id}}" method="POST" enctype="multipart/form-data">
 				{{ form.hidden_tag() }}
 				<input type="hidden" name="_method" value="DELETE">

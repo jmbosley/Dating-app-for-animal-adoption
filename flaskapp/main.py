@@ -384,6 +384,7 @@ def accountChoices():
 
 # Create Animal
 @app.route('/' + ANIMALS, methods=['GET', 'POST'])
+@admin_required
 def createAnimal():
     form = createAnimalForm()
 
@@ -394,11 +395,9 @@ def createAnimal():
         if form.validate_on_submit() is False:
             return render_template('createAnimal.html', title='Create Animal', form=form)
 
-        
-
         content = form.data
         content['breed'] = content.get(f'breed{content.get('type')}')        
-        
+
         # check if minimum info was provided
         if not (set(MIN_ANIMAL).issubset(content)):
             return ERROR_MISSING_VALUE, 400
@@ -442,16 +441,21 @@ def animalFunctions(id):
     del_form = deleteButton()
     edit_form = editAnimalForm()
 
+    if entityExists(animal, id) is False:
+        return ERROR_NOT_FOUND_ANIMAL, 400
+
     if request.method == 'GET':  # display page
         query = sa.select(animal).where(animal.id == id)
         animals = db.session.execute(query).mappings().all()
-        if animals is None:
-            return ERROR_NOT_FOUND_ANIMAL, 404
         curr_animal = animals[0]['animal']
 
         return render_template("animal.html", title=f"Pet Profile: {curr_animal.name}", curr_animal=curr_animal, form=del_form), 200
 
     if request.method == 'POST':
+        if not current_user.is_authenticated or not current_user.admin:
+            flash('You need to be an admin to access this page.', 'danger')
+            return redirect(url_for('login'))
+        
         curr_method = request.form['_method']
 
         if curr_method == 'DELETE':
@@ -508,15 +512,17 @@ def animalFunctions(id):
             return redirect('/' + ANIMALS + '/' + str(id))
 
 @app.route('/' + "edit/" + ANIMALS + '/<int:id>', methods=['GET'])
+@admin_required
 def AnimalEdit(id):
     form = editAnimalForm()
+
+    if entityExists(animal, id) is False:
+        return ERROR_NOT_FOUND_ANIMAL, 400
 
     if request.method == 'GET':  # display page
         query = sa.select(animal).where(animal.id == id)
         # select animal
         curr_animal = db.session.execute(query).mappings().all()
-        if curr_animal is None:
-            return ERROR_NOT_FOUND_ANIMAL, 404
         curr_animal = curr_animal[0]['animal']
 
         form.iduser.choices = accountChoices()
@@ -545,6 +551,7 @@ def animalChoices():
 
 # Create News Post
 @app.route('/' + NEWSPOSTS, methods=['GET', 'POST'])
+@admin_required
 def createNewsPost():
     form = createNewsPostForm()
     form.idAnimal.choices = animalChoices()
@@ -556,7 +563,7 @@ def createNewsPost():
 
     if request.method == 'POST':  # add newsPost
         if form.validate_on_submit() is False:
-            return render_template('createAnimal.html', title='Create Animal', form=form)
+            return render_template('createNewsPost.html', title='Create News Post', form=form)
 
         content = form.data
 
@@ -586,6 +593,9 @@ def newsPostFunctions(id):
     edit_form = editNewsPostForm()
     edit_form.idAnimal.choices = animalChoices()
 
+    if entityExists(newsPost, id) is False:
+        return ERROR_NOT_FOUND_NEWSPOST, 400
+
     if request.method == 'GET':  # display page
         form = del_form
         query = sa.select(newsPost).where(newsPost.id == id)
@@ -597,6 +607,10 @@ def newsPostFunctions(id):
 
 
     if request.method == 'POST':
+        if not current_user.is_authenticated or not current_user.admin:
+            flash('You need to be an admin to access this page.', 'danger')
+            return redirect(url_for('login'))
+
         curr_method = request.form['_method']
 
         if curr_method == 'PUT':
@@ -607,7 +621,7 @@ def newsPostFunctions(id):
             content = form.data
 
             if content.get('idAnimal'): # if not falsy: "" or None
-                # check if user exists if one was provided
+                # check if animal exists if one was provided
                 if entityExists(animal, content.get('idAnimal')) is False:
                     return ERROR_NOT_FOUND_ANIMAL, 400
 
@@ -627,8 +641,12 @@ def newsPostFunctions(id):
 
     
 @app.route('/' + "edit/" + NEWSPOSTS + '/<int:id>', methods=['GET'])
+@admin_required
 def newsPostEdit(id):
     form = editNewsPostForm()
+
+    if entityExists(newsPost, id) is False:
+        return ERROR_NOT_FOUND_NEWSPOST, 400
 
     if request.method == 'GET':  # display page
         query = sa.select(newsPost).where(newsPost.id == id)

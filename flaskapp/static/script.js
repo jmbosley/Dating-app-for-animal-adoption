@@ -11,6 +11,7 @@ function confirmDeletion(type) {
   return confirm(`Are you sure you want to permanently delete this ${type}?`);
 }
 
+// slideshow functions
 // https://www.w3schools.com/howto/howto_js_slideshow.asp
 function plusSlides(n) {
   	showSlides(slideIndex += n);
@@ -36,7 +37,11 @@ function showSlides(n) {
   dots[slideIndex-1].className += " active";
 	}
 
-// choose which breed select to display based on type
+/**
+ * Takes a list of possible types (which will influence available breeds).
+ * Makes all breed selections invisible except for the one that corresponds
+ * to that type (breedType)
+ */
 function breedDisplay(typeChoices) {
   let selectedType = document.getElementById("type").value;
 

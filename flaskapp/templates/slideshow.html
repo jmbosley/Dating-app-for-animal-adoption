@@ -5,7 +5,7 @@
 	<div class="mySlides fade">
     	<div class="numbertext">1 / 1</div>
 		{% set image_url = 'images/animalImages/placeholderAnimal.png' %}
-    	<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:100%" class="user-image">
+    	<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:100%">
   	</div>
 	
 	{% else %}
@@ -13,7 +13,7 @@
   	<div class="mySlides fade">
     	<div class="numbertext">{{img_num + 1}} / {{curr_animal.numImages}}</div>
 		{% set image_url = 'images/animalImages/animalImg_' + (curr_animal.id|string) + '_' + (img_num|string) + '.jpg' %}
-    	<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:100%" class="user-image">
+    	<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:100%">
   	</div>
 	{% endfor %}
 	{% endif %}

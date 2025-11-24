@@ -82,6 +82,7 @@ class createAnimalForm(FlaskForm):
     type = SelectField('Type', validators=[DataRequired()], choices=ANIMAL_TYPES, render_kw={'onchange': "breedDisplay(typeChoices)"})
     
     breed = StringField('Breed', validators=[Optional(), Length(min=0, max=45)])
+    # selections possible based on type
     breedDog = SelectField('Breed', validators=[Optional()], choices=DOG_BREEDS)
     breedCat = SelectField('Breed', validators=[Optional()], choices=CAT_BREEDS)
     breedOther = SelectField('Breed', validators=[Optional()], choices=OTHER_BREEDS)
