@@ -36,17 +36,17 @@ function showSlides(n) {
   dots[slideIndex-1].className += " active";
 	}
 
-function breedDisplay() {
+// choose which breed select to display based on type
+function breedDisplay(typeChoices) {
   let selectedType = document.getElementById("type").value;
-  let typeChoices = {{ form.type.choices|safe }};
 
   for (let i = 0; i < typeChoices.length; i++) {
-    animalType = typeChoices[i];
-    if (selectedType == animalType) {
-       document.getElementById(`breed${animalType}`).style.display = "initial";
-    }
-    else {
-      document.getElementById(`breed${animalType}`).style.display = "none";
-    }
+      let animalType = typeChoices[i];
+      if (selectedType == animalType) {
+        document.getElementById(`breed${animalType}`).style.display = "initial";
+      }
+      else {
+        document.getElementById(`breed${animalType}`).style.display = "none";
+      }
   }
 }

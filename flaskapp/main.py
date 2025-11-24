@@ -397,8 +397,7 @@ def createAnimal():
         
 
         content = form.data
-        content['breed'] = content.get(f'breed{content.get('type')}')
-        print(content['breed'])         
+        content['breed'] = content.get(f'breed{content.get('type')}')        
         
         # check if minimum info was provided
         if not (set(MIN_ANIMAL).issubset(content)):
@@ -478,6 +477,8 @@ def animalFunctions(id):
             # update dynamic choices
             form.iduser.choices = accountChoices()
             content = form.data
+            # set breed from the correct select
+            content['breed'] = content.get(f'breed{content.get('type')}')   
 
             if form.validate_on_submit() is False:
                 # print(form.errors.items())
@@ -520,6 +521,11 @@ def AnimalEdit(id):
 
         form.iduser.choices = accountChoices()
         prefillEditForm(form, curr_animal)
+
+        # breed select field changes depending on type
+        breed_field = getattr(form, f'breed{curr_animal.type}')  
+        breed_field.default = curr_animal.breed
+        form.process()
 
         return render_template("editAnimal.html", title="Edit Animal", curr_animal=curr_animal, form=form), 200
 

@@ -37,16 +37,15 @@
             {% endfor %}
         </p>
 
-
         <p>
             {{ form.breedDog.label }}<br>
-            {{ form.breedDog }}
+            {{ form.breedDog() }}
 			{% for error in form.breedDog.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
-            {{ form.breedCat }}
+            {{ form.breedCat() }}
 			{% for error in form.breedCat.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
@@ -120,20 +119,7 @@
 </body>
 
 <script>
-    function breedDisplay() {
-        let selectedType = document.getElementById("type").value;
-        let typeChoices = {{ form.type.choices|safe }};
-
-        for (let i = 0; i < typeChoices.length; i++) {
-            animalType = typeChoices[i];
-            if (selectedType == animalType) {
-               document.getElementById(`breed${animalType}`).style.display = "initial";
-            }
-            else {
-              document.getElementById(`breed${animalType}`).style.display = "none";
-            }
-        }
-    }
-    breedDisplay()
+    let typeChoices = {{form.type.choices|tojson|safe}};
+    breedDisplay( typeChoices );
 </script>
 {% endblock %}
