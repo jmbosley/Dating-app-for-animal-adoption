@@ -13,6 +13,16 @@ app.config.from_object(Config)
 db = SQLAlchemy(app) # checks config and makes db from uri
 migrate = Migrate(app, db) # can update database layout based on models.py
 
+# https://gist.github.com/asyd/a7aadcf07a66035ac15d284aef10d458
+# Ensure FOREIGN KEY for sqlite3
+if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
+    def _fk_pragma_on_connect(dbapi_con, con_record):  # noqa
+        dbapi_con.execute('pragma foreign_keys=ON')
+
+    with app.app_context():
+        from sqlalchemy import event
+        event.listen(db.engine, 'connect', _fk_pragma_on_connect)
+
 # Initialize Flask-Login
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'  # redirect to login page if not authenticated

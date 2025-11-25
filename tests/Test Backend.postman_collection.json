@@ -8,6 +8,62 @@
 	},
 	"item": [
 		{
+			"name": "200 Set CSRF for Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var cheerio = require('cheerio');\r",
+							"// https://community.postman.com/t/getting-a-specific-content-in-html-response/14734/8\r",
+							"$ = cheerio.load(pm.response.text());\r",
+							"\r",
+							"var token = $('[name=csrf_token]').val()\r",
+							"console.log(token);\r",
+							"\r",
+							"pm.environment.set(\"csrf_token\", token);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/createanimal",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"createanimal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
 			"name": "201 Create Public Account",
 			"request": {
 				"method": "POST",
@@ -264,7 +320,7 @@
 			"response": []
 		},
 		{
-			"name": "200 Set CSRF for Create Animal",
+			"name": "200 Set CSRF for Create Animal Copy",
 			"event": [
 				{
 					"listen": "test",
@@ -416,18 +472,177 @@
 			"response": []
 		},
 		{
+			"name": "201 Update Animal",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var xsrfCookie = postman.getResponseCookie(\"csrftoken\"); postman.setEnvironmentVariable('csrftoken', xsrfCookie.value);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "\"Fluffy\"",
+							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "\"Cat\"",
+							"type": "text"
+						},
+						{
+							"key": "breed",
+							"value": "\"Siamese\"",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": " \"Likes fish\"",
+							"type": "text"
+						},
+						{
+							"key": "children",
+							"value": "y",
+							"type": "text"
+						},
+						{
+							"key": "dogs",
+							"value": "y",
+							"type": "text"
+						},
+						{
+							"key": "cats",
+							"value": "y",
+							"type": "text"
+						},
+						{
+							"key": "csrf_token",
+							"value": "{{csrf_token}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{app_url}}/createanimal",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"createanimal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Delete Animal",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var xsrfCookie = postman.getResponseCookie(\"csrftoken\"); postman.setEnvironmentVariable('csrftoken', xsrfCookie.value);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "csrf_token",
+							"value": "{{csrf_token}}",
+							"type": "text"
+						},
+						{
+							"key": "_method",
+							"value": "DELETE",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{app_url}}/animals/{{a_acc2}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"animals",
+						"{{a_acc2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "201 Create News Post",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"title\": \"News\",\r\n  \"body\": \"Adopt a cat today\",\r\n  \"idAnimal\": 1\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "title",
+							"value": "Adopt this animal today!",
+							"type": "text"
+						},
+						{
+							"key": "body",
+							"value": "They're looking for a home.",
+							"type": "text"
+						},
+						{
+							"key": "idAnimal",
+							"value": "3",
+							"type": "text"
+						},
+						{
+							"key": "csrf_token",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
-					}
+					]
 				},
 				"url": {
 					"raw": "{{app_url}}/newsPosts",
@@ -462,25 +677,40 @@
 		{
 			"name": "200 Update News Post",
 			"request": {
-				"method": "PUT",
+				"method": "POST",
 				"header": [],
 				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"title\": \"Today's news\",\r\n  \"body\": \"Adopt a dog tomorrow\",\r\n  \"idAnimal\": 3\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "title",
+							"value": "Adopt this animal today!",
+							"type": "text"
+						},
+						{
+							"key": "body",
+							"value": "They're looking for a home.",
+							"type": "text"
+						},
+						{
+							"key": "idAnimal",
+							"value": "3",
+							"type": "text"
+						},
+						{
+							"key": "csrf_token",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
-					}
+					]
 				},
 				"url": {
-					"raw": "{{app_url}}/newsPosts/{{news1}}",
+					"raw": "{{app_url}}/newsPosts",
 					"host": [
 						"{{app_url}}"
 					],
 					"path": [
-						"newsPosts",
-						"{{news1}}"
+						"newsPosts"
 					]
 				}
 			},

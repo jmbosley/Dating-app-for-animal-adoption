@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 3cf5d8c61f85
+Revision ID: 34567490a0cb
 Revises: 
-Create Date: 2025-11-15 15:31:16.978668
+Create Date: 2025-11-24 04:43:11.114326
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3cf5d8c61f85'
+revision = '34567490a0cb'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -57,7 +57,7 @@ def upgrade():
     sa.Column('body', sa.String(length=10000), nullable=False),
     sa.Column('datePublished', sa.Date(), nullable=False),
     sa.Column('idAnimal', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['idAnimal'], ['animals.id'], ),
+    sa.ForeignKeyConstraint(['idAnimal'], ['animals.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('newsPosts', schema=None) as batch_op:

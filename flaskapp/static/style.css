@@ -3,6 +3,7 @@
     --accent1: #c65454;
     --lightred: #f7e3e3;
     --darkaccent: #131212;
+    --mediumaccent: #817b7b;
     --lightaccent: #f8f8f8;
     --greyaccent: #d4d4d4;
 }
@@ -46,6 +47,7 @@ h1{
 .split div.header{
     grid-area: header;
     text-align: center;
+    min-height: 75px;
 }
 .split div.image{
     grid-area: image;
@@ -59,6 +61,7 @@ h1{
 .split div.options{
     grid-area: options;
     text-align: right;
+    min-height: 75px;
 }
 
 
@@ -66,6 +69,11 @@ h1{
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+}
+
+.important, label {
+    font-weight: 500;
+    font-size: 1.125em;
 }
 
 /* Navigation */
@@ -408,6 +416,14 @@ tbody tr:nth-child(odd){
   position: relative;
   margin: auto;
   display: flex;
+  
+  justify-content: center;
+  align-items: center;
+
+  width: 50%;
+  height: auto;
+  overflow: hidden;
+  aspect-ratio: 1/1;
 }
 
 /* Hide the images by default */
@@ -437,6 +453,10 @@ tbody tr:nth-child(odd){
   border-radius: 3px 0 0 3px;
 }
 
+.prev {
+  left: 0;
+}
+
 /* On hover, add a black background color with a little bit see-through */
 .prev:hover, .next:hover {
   background-color: var(--darkaccent);
@@ -464,7 +484,7 @@ tbody tr:nth-child(odd){
 }
 
 .active, .dot:hover {
-  background-color: var(--greyaccent);
+  background-color: var(--mediumaccent);
 }
 
 /* Fading animation */

@@ -44,13 +44,27 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-		<p>
-            {{ form.breed.label }}<br> <!-- might change to select later -->
-            {{ form.breed(size=45, placeholder=curr_animal.breed) }}
-			{% for error in form.breed.errors %}
+
+        <p>
+            {{ form.breedDog.label }}<br>
+            {{ form.breedDog() }}
+			{% for error in form.breedDog.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+        <p>
+            {{ form.breedCat() }}
+			{% for error in form.breedCat.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.breedOther }}
+			{% for error in form.breedOther.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
 		<p>
             {{ form.description.label }}<br>
             {{ form.description(placeholder=curr_animal.description) }}
@@ -61,7 +75,6 @@
         </div>
 
         <div class="text">
-		<legend>Disposition</legend>
 		<p>
             {{ form.children.label }}<br>
             {{ form.children() }}
@@ -107,8 +120,13 @@
                     {{ form.submit(class="btn btn-secondary") }} 
                 </p>
 			</div>
-
+            
 	</div>
 	</form>
 </body>
+
+<script>
+    let typeChoices = {{form.type.choices|tojson|safe}};
+    breedDisplay( typeChoices );
+</script>
 {% endblock %}

@@ -40,7 +40,7 @@
 
 			<div class="text">
                 <p>
-                userName: {{account.userName}}<br>
+                <span class="important">userName:</span> {{account.userName}}<br>
                 {{ form.email.label }}: <!-- form field legend, input field -->
                 {{ form.email(size=20, placeholder=account.email) }}
                 {% for error in form.firstName.errors %}

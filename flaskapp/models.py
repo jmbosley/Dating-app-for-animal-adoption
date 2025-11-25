@@ -64,7 +64,7 @@ class animal(db.Model):
 
     iduser: Mapped[int] = mapped_column(sa.ForeignKey(user.id), index=True, nullable=True)
 
-    newsPosts: WriteOnlyMapped['newsPost'] = relationship(back_populates='animal')
+    newsPosts: WriteOnlyMapped['newsPost'] = relationship(back_populates='animal', cascade='all, delete-orphan', passive_deletes=True)
 
     # can access related user with foreign key or with animalObject.user
     user: Mapped['user'] = relationship(back_populates='animals')
@@ -77,7 +77,8 @@ class newsPost(db.Model):
     body: Mapped[str] = mapped_column(sa.String(10000))
     datePublished: Mapped[date] = mapped_column(default=date.today(), index=True)
 
-    idAnimal: Mapped[int] = mapped_column(sa.ForeignKey(animal.id), index=True, nullable=True)
+    idAnimal: Mapped[int] = mapped_column(sa.ForeignKey(animal.id, ondelete='CASCADE'), index=True, nullable=True)
 
     # directly access related animal objects with newsPost.animal instead of selecting them with foreign id
+    # delete newsPost if corresponding animal is deleted
     animal: Mapped['animal'] = relationship(back_populates='newsPosts')

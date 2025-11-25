@@ -1,0 +1,35 @@
+<!-- Slideshow made with help from https://www.w3schools.com/howto/howto_js_slideshow.asp -->
+<div class="slideshow-container">
+	{% if curr_animal.numImages == 0 %}
+	<!-- placeholder image https://pixabay.com/vectors/dogs-paw-print-cat-silhouette-7284056/ -->
+	<div class="mySlides fade">
+    	<div class="numbertext">1 / 1</div>
+		{% set image_url = 'images/animalImages/placeholderAnimal.png' %}
+    	<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:100%">
+  	</div>
+	
+	{% else %}
+	{% for img_num in range(curr_animal.numImages) %}
+  	<div class="mySlides fade">
+    	<div class="numbertext">{{img_num + 1}} / {{curr_animal.numImages}}</div>
+		{% set image_url = 'images/animalImages/animalImg_' + (curr_animal.id|string) + '_' + (img_num|string) + '.jpg' %}
+    	<img src="{{ url_for('static', filename=image_url) }}" alt="Animal Image" style="max-width:100%">
+  	</div>
+	{% endfor %}
+	{% endif %}
+			
+{% if curr_animal.numImages > 1 %}
+<!-- Next and previous buttons -->
+<a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+<a class="next" onclick="plusSlides(1)">&#10095;</a>
+{% endif %}
+</div>
+			
+{% if curr_animal.numImages > 1 %}
+<!-- The dots/circles -->
+<div style="text-align:center">
+	{% for img_num in range(curr_animal.numImages) %}
+  	<span class="dot" onclick="currentSlide({{img_num}} + 1)"></span>
+	{% endfor %}
+</div>
+{% endif %}
