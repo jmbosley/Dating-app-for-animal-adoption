@@ -53,7 +53,9 @@ The content of other pages is inserted into block content.
         <a href="/">Home</a>
         <a href="/">Browse Animals</a>
         <!-- TODO: Make Below only Viewable from Admin Account -->
+        {% if current_user.admin %}
         <a href="/viewaccounts">View Accounts</a>
+        {% endif %}
     </nav>   
 
     <main>

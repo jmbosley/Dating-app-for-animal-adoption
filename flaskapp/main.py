@@ -289,6 +289,7 @@ def userEdit(id):
 
 # -------------------------------------------------------- Admin Pages
 @app.route('/' + 'view' + ACCOUNTS, methods=['GET'])
+@admin_required
 def displayAccounts():
     if request.method == 'GET':  # display page
         query = sa.select(user)
@@ -299,6 +300,7 @@ def displayAccounts():
 
 
 @app.route('/' + 'delete' + '/<int:id>', methods=['GET'])
+@admin_required
 def deleteUser(id):
     query = sa.delete(user).where(user.id == id)
     db.session.execute(query)
@@ -307,6 +309,7 @@ def deleteUser(id):
 
 
 @app.route('/' + 'changeadmin' + '/<int:id>', methods=['GET'])
+@admin_required
 def changeAdmin(id):
     query = sa.select(user).where(user.id == id)
     adminValue = db.session.execute(query).mappings().all()[0]['user'].admin
