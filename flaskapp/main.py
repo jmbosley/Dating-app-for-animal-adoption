@@ -12,6 +12,8 @@ from PIL import Image
 from flask_login import login_user, logout_user, login_required, current_user
 from functools import wraps
 
+from flask_bcrypt import Bcrypt
+
 
 ACCOUNTS = "accounts"
 ADMINS = "administrator"
@@ -20,6 +22,8 @@ NEWSPOSTS = "newsPosts"
 MIN_ACCOUNT = ['firstName', 'lastName', 'email', 'password', 'userName']  # optional: phoneNumber
 MIN_ANIMAL = ['name', 'type', 'children', 'dogs', 'cats', 'needsLeash']  # optional or defaulted: breed, availability, description, numImages
 MIN_NEWSPOST = ['title', 'body']  # idAnimal, datePublished
+bcrypt = Bcrypt()
+
 # errors
 ERROR_FORM = "Form returned an error"
 ERROR_MISSING_VALUE = "Not all required values were provided"
@@ -95,8 +99,8 @@ def login():
             flash('Invalid username or password', 'danger')
             return redirect(url_for('login'))
         
-        #check password using the existing password field (plain text for now)
-        if user_obj.password != form.password.data:
+        #check password using the existing password field
+        if not bcrypt.check_password_hash(user_obj.password, form.password.data):
             flash('Invalid username or password', 'danger')
             return redirect(url_for('login'))
         
@@ -172,11 +176,12 @@ def createuser():
     if request.method == 'POST':  # add Account
         if form.validate_on_submit():
             content = form.data
+            password_hash = bcrypt.generate_password_hash(content.get('password')).decode('utf-8')
             new_account = user(
                                 firstName=content.get('firstName'),
                                 lastName=content.get('lastName'),
                                 userName=content.get('userName'),
-                                password=content.get('password'),  # Using plain password field for now
+                                password=password_hash,
                                 email=content.get('email'),
                                 phoneNumber=content.get('phoneNumber'),
                                 numImages=0,
@@ -226,10 +231,11 @@ def userFunctions(id):
         # Only admin can delete accounts
         if not current_user.admin:
             return ERROR_UNAUTHORIZED, 403
-        query = sa.delete(user).where(user.id == id)
-        db.session.execute(query)
-        db.session.commit()
-        return ('', 204)
+        else:
+            query = sa.delete(user).where(user.id == id)
+            db.session.execute(query)
+            db.session.commit()
+            return ('', 204)
     if request.method == 'POST':
         content = form.data
         print(content)
