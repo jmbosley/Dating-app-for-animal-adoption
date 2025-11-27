@@ -84,7 +84,7 @@ def prefillEditForm(form, entity):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('root'))
+        return redirect(url_for('browse'))
     
     form = LoginForm()
     if form.validate_on_submit():
@@ -123,12 +123,71 @@ def logout():
     flash('You have been logged out successfully.', 'info')
     return redirect(url_for('root'))
 
+# -------------------------------------------------------- Browse Animals Routes
+
+@app.route('/browse')
+@login_required
+def browse():
+    """Browse animals page with filtering"""
+    
+    #Start with base query
+    query = sa.select(animal)
+    
+    #to apply filters from user
+    filters = []
+    
+    #type filter
+    animal_type = request.args.get('type')
+    if animal_type:
+        filters.append(animal.type == animal_type)
+    
+    #Breed filter
+    breed = request.args.get('breed')
+    if breed:
+        filters.append(animal.breed == breed)
+    
+    #Availability filter
+    availability = request.args.get('availability')
+    if availability:
+        filters.append(animal.availability == availability)
+    
+    #Disposition filters
+    if request.args.get('good_with_children') == 'true':
+        filters.append(animal.children == True)
+    
+    if request.args.get('good_with_dogs') == 'true':
+        filters.append(animal.dogs == True)
+    
+    if request.args.get('good_with_cats') == 'true':
+        filters.append(animal.cats == True)
+    
+    if request.args.get('needs_leash') == 'true':
+        filters.append(animal.needsLeash == True)
+    
+    # Apply all filters
+    if filters:
+        query = query.where(sa.and_(*filters))
+    
+    # Apply our sorting
+    sort_by = request.args.get('sort', 'newest')
+    if sort_by == 'oldest':
+        query = query.order_by(animal.id.asc())
+    elif sort_by == 'name':
+        query = query.order_by(animal.name.asc())
+    else:  #sort by newest as default
+        query = query.order_by(animal.id.desc())
+    
+    #executes query
+    animals = db.session.execute(query).scalars().all()
+    
+    return render_template('browse.html', animals=animals)
 
 # -------------------------------------------------------- Public Routes
 
 @app.route("/")
 def root():
     return render_template("index.html", title="Animal Adoption Dating Site")
+
 
 
 # -------------------------------------------------------- Public Account

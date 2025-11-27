@@ -1,0 +1,514 @@
+{% extends "base.html" %}
+{% block title %}Browse Animals - Animal Adoption Dating Site{% endblock %}
+
+{% block content %}
+<!-- Browse Header -->
+<section class="browse-header">
+    <div class="container">
+        <h1>Find Your Perfect Companion</h1>
+        <p>Browse through shelter animals looking for their forever homes!</p>
+    </div>
+</section>
+
+<!-- Filters Section -->
+<section class="filters-section">
+    <div class="container">
+        <form id="filterForm" method="GET" action="/browse">
+            <div class="filters-grid">
+                <!-- Type Filter -->
+                <div class="filter-group">
+                    <label for="type">Animal Type</label>
+                    <select name="type" id="type" class="filter-select">
+                        <option value="">All Types</option>
+                        <option value="Dog" {% if request.args.get('type') == 'Dog' %}selected{% endif %}>Dog</option>
+                        <option value="Cat" {% if request.args.get('type') == 'Cat' %}selected{% endif %}>Cat</option>
+                        <option value="Other" {% if request.args.get('type') == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+
+                <!-- Breed Filter -->
+                <div class="filter-group">
+                    <label for="breed">Breed</label>
+                    <select name="breed" id="breed" class="filter-select">
+                        <option value="">All Breeds</option>
+                        <optgroup label="Dog Breeds">
+                            <option value="Labrador" {% if request.args.get('breed') == 'Labrador' %}selected{% endif %}>Labrador</option>
+                            <option value="German Shepherd" {% if request.args.get('breed') == 'German Shepherd' %}selected{% endif %}>German Shepherd</option>
+                            <option value="Golden Retriever" {% if request.args.get('breed') == 'Golden Retriever' %}selected{% endif %}>Golden Retriever</option>
+                            <option value="Bulldog" {% if request.args.get('breed') == 'Bulldog' %}selected{% endif %}>Bulldog</option>
+                            <option value="Beagle" {% if request.args.get('breed') == 'Beagle' %}selected{% endif %}>Beagle</option>
+                            <option value="Poodle" {% if request.args.get('breed') == 'Poodle' %}selected{% endif %}>Poodle</option>
+                            <option value="Mixed" {% if request.args.get('breed') == 'Mixed' %}selected{% endif %}>Mixed Breed</option>
+                        </optgroup>
+                        <optgroup label="Cat Breeds">
+                            <option value="Persian" {% if request.args.get('breed') == 'Persian' %}selected{% endif %}>Persian</option>
+                            <option value="Maine Coon" {% if request.args.get('breed') == 'Maine Coon' %}selected{% endif %}>Maine Coon</option>
+                            <option value="Siamese" {% if request.args.get('breed') == 'Siamese' %}selected{% endif %}>Siamese</option>
+                            <option value="British Shorthair" {% if request.args.get('breed') == 'British Shorthair' %}selected{% endif %}>British Shorthair</option>
+                            <option value="Ragdoll" {% if request.args.get('breed') == 'Ragdoll' %}selected{% endif %}>Ragdoll</option>
+                            <option value="Domestic Shorthair" {% if request.args.get('breed') == 'Domestic Shorthair' %}selected{% endif %}>Domestic Shorthair</option>
+                        </optgroup>
+                        <option value="Other" {% if request.args.get('breed') == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+
+                <!-- Availability Filter -->
+                <div class="filter-group">
+                    <label for="availability">Availability</label>
+                    <select name="availability" id="availability" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="Available" {% if request.args.get('availability') == 'Available' %}selected{% endif %}>Available</option>
+                        <option value="Pending" {% if request.args.get('availability') == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Adopted" {% if request.args.get('availability') == 'Adopted' %}selected{% endif %}>Adopted</option>
+                        <option value="Not Available" {% if request.args.get('availability') == 'Not Available' %}selected{% endif %}>Not Available</option>
+                    </select>
+                </div>
+
+                <!-- Sort By -->
+                <div class="filter-group">
+                    <label for="sort">Sort By</label>
+                    <select name="sort" id="sort" class="filter-select">
+                        <option value="newest" {% if request.args.get('sort') == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="oldest" {% if request.args.get('sort') == 'oldest' %}selected{% endif %}>Oldest First</option>
+                        <option value="name" {% if request.args.get('sort') == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Disposition Checkboxes -->
+            <div class="disposition-filters">
+                <label class="disposition-label">Disposition:</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="good_with_children" value="true" 
+                               {% if request.args.get('good_with_children') == 'true' %}checked{% endif %}>
+                        <span>Good with Children</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="good_with_dogs" value="true"
+                               {% if request.args.get('good_with_dogs') == 'true' %}checked{% endif %}>
+                        <span>Good with Dogs</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="good_with_cats" value="true"
+                               {% if request.args.get('good_with_cats') == 'true' %}checked{% endif %}>
+                        <span>Good with Cats</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="needs_leash" value="true"
+                               {% if request.args.get('needs_leash') == 'true' %}checked{% endif %}>
+                        <span>Must be Leashed</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                <a href="/browse" class="btn btn-secondary">Clear All</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Animals List -->
+<section class="animals-section">
+    <div class="container">
+        {% if animals %}
+            <p class="results-count">Found {{ animals|length }} adorable {% if animals|length == 1 %}animal{% else %}animals{% endif %}</p>
+            
+            <div class="animals-list">
+                {% for animal in animals %}
+                <a href="/animals/{{ animal.id }}" class="animal-card-link">
+                    <div class="animal-card-horizontal">
+                        <div class="animal-image-section">
+                            {% if animal.numImages == 0 %}
+                                <img src="{{ url_for('static', filename='images/animalImages/placeholderAnimal.jpg') }}" 
+                                     alt="{{ animal.name }}" class="animal-card-image">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/animalImages/animalImg_' + (animal.id|string) + '_0.jpg') }}" 
+                                     alt="{{ animal.name }}" class="animal-card-image">
+                                {% if animal.numImages > 1 %}
+                                    <span class="more-images-badge">+{{ animal.numImages - 1 }} more</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="animal-info-section">
+                            <div class="animal-header">
+                                <h2 class="animal-name">{{ animal.name }}</h2>
+                                <span class="availability-badge badge-{{ animal.availability|lower|replace(' ', '-') }}">
+                                    {{ animal.availability }}
+                                </span>
+                            </div>
+                            
+                            <div class="animal-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Species:</span>
+                                    <span class="detail-value">{{ animal.type }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Breed:</span>
+                                    <span class="detail-value">{{ animal.breed or 'Unknown' }}</span>
+                                </div>
+                                {% if animal.birthday %}
+                                <div class="detail-item">
+                                    <span class="detail-label">Birthday:</span>
+                                    <span class="detail-value">{{ animal.birthday.strftime('%B %d, %Y') }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="animal-tags">
+                                {% if animal.children %}
+                                    <span class="tag tag-green">Good with Children</span>
+                                {% endif %}
+                                {% if animal.dogs %}
+                                    <span class="tag tag-blue">Good with Dogs</span>
+                                {% endif %}
+                                {% if animal.cats %}
+                                    <span class="tag tag-purple">Good with Cats</span>
+                                {% endif %}
+                                {% if animal.needsLeash %}
+                                    <span class="tag tag-yellow">Needs Leash</span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if animal.description %}
+                            <p class="animal-description">
+                                {{ animal.description[:150] }}{% if animal.description|length > 150 %}...{% endif %}
+                            </p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-arrow">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-results">
+                <h3>No results found</h3>
+                <p>Try changing filters to see more results</p>
+                <a href="/browse" class="btn btn-primary">Clear Filters</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+/*Browse Page Specific Styles */
+.browse-header {
+    background: linear-gradient(100deg, #7c4faa 0%, #c65454 100%);
+    color: white;
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.browse-header h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.browse-header p {
+    font-size: 2rem;
+}
+
+/* Filters Section */
+.filters-section {
+    background: #f8f9fa;
+    padding: 2rem 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 1rem;
+    font-weight: 1000;
+    color: #333;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: white;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #7c4faa;
+}
+
+/* Disposition Filters */
+.disposition-filters {
+    margin-bottom: 2rem;
+}
+
+.disposition-label {
+    display: block;
+    margin-bottom: 1rem;
+    font-weight: 1000;
+    color: #333;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    margin-right: 1rem;
+    width: 20px;
+    height: 20px;
+    accent-color: #7c4faa;
+}
+
+.checkbox-label span {
+    color: #555;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Animals Section */
+.animals-section {
+    padding: 3rem 0;
+    min-height: 500px;
+}
+
+.results-count {
+    margin-bottom: 2rem;
+    color: #666;
+    font-size: 1rem;
+}
+
+.animals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Animal Cards */
+.animal-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.animal-card-horizontal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+.animal-card-horizontal:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.animal-image-section {
+    flex-shrink: 0;
+    width: 250px;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.animal-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.more-images-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.animal-info-section {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.animal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.animal-name {
+    font-size: 2rem;
+    color: #333;
+    margin: 0;
+}
+
+.availability-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 1000;
+}
+
+.badge-available {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-adopted {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.badge-not-available {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.animal-details {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    gap: 1rem;
+}
+
+.detail-label {
+    font-weight: 1000;
+    color: #666;
+}
+
+.detail-value {
+    color: #333;
+}
+
+.animal-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.tag {
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.tag-green {
+    background: #d4edda;
+    color: #155724;
+}
+
+.tag-blue {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.tag-purple {
+    background: #e7d9f7;
+    color: #432874;
+}
+
+.tag-yellow {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.animal-description {
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.card-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    color: #c65454;
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+}
+
+.no-results h3 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1000px) {
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .animal-card-horizontal {
+        flex-direction: column;
+    }
+    
+    .animal-image-section {
+        width: 100%;
+        height: 200px;
+    }
+    
+    .animal-details {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .card-arrow {
+        display: none;
+    }
+}
+</style>
+
+{% endblock %}
