@@ -31,24 +31,36 @@
                     <label for="breed">Breed</label>
                     <select name="breed" id="breed" class="filter-select">
                         <option value="">All Breeds</option>
+                        
+                        {% if dog_breeds %}
                         <optgroup label="Dog Breeds">
-                            <option value="Labrador" {% if request.args.get('breed') == 'Labrador' %}selected{% endif %}>Labrador</option>
-                            <option value="German Shepherd" {% if request.args.get('breed') == 'German Shepherd' %}selected{% endif %}>German Shepherd</option>
-                            <option value="Golden Retriever" {% if request.args.get('breed') == 'Golden Retriever' %}selected{% endif %}>Golden Retriever</option>
-                            <option value="Bulldog" {% if request.args.get('breed') == 'Bulldog' %}selected{% endif %}>Bulldog</option>
-                            <option value="Beagle" {% if request.args.get('breed') == 'Beagle' %}selected{% endif %}>Beagle</option>
-                            <option value="Poodle" {% if request.args.get('breed') == 'Poodle' %}selected{% endif %}>Poodle</option>
-                            <option value="Mixed" {% if request.args.get('breed') == 'Mixed' %}selected{% endif %}>Mixed Breed</option>
+                            {% for breed in dog_breeds %}
+                            <option value="{{ breed }}" {% if request.args.get('breed') == breed %}selected{% endif %}>
+                                {{ breed }}
+                            </option>
+                            {% endfor %}
                         </optgroup>
+                        {% endif %}
+                        
+                        {% if cat_breeds %}
                         <optgroup label="Cat Breeds">
-                            <option value="Persian" {% if request.args.get('breed') == 'Persian' %}selected{% endif %}>Persian</option>
-                            <option value="Maine Coon" {% if request.args.get('breed') == 'Maine Coon' %}selected{% endif %}>Maine Coon</option>
-                            <option value="Siamese" {% if request.args.get('breed') == 'Siamese' %}selected{% endif %}>Siamese</option>
-                            <option value="British Shorthair" {% if request.args.get('breed') == 'British Shorthair' %}selected{% endif %}>British Shorthair</option>
-                            <option value="Ragdoll" {% if request.args.get('breed') == 'Ragdoll' %}selected{% endif %}>Ragdoll</option>
-                            <option value="Domestic Shorthair" {% if request.args.get('breed') == 'Domestic Shorthair' %}selected{% endif %}>Domestic Shorthair</option>
+                            {% for breed in cat_breeds %}
+                            <option value="{{ breed }}" {% if request.args.get('breed') == breed %}selected{% endif %}>
+                                {{ breed }}
+                            </option>
+                            {% endfor %}
                         </optgroup>
-                        <option value="Other" {% if request.args.get('breed') == 'Other' %}selected{% endif %}>Other</option>
+                        {% endif %}
+                        
+                        {% if other_breeds %}
+                        <optgroup label="Other Breeds">
+                            {% for breed in other_breeds %}
+                            <option value="{{ breed }}" {% if request.args.get('breed') == breed %}selected{% endif %}>
+                                {{ breed }}
+                            </option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endif %}
                     </select>
                 </div>
 
@@ -122,7 +134,7 @@
                     <div class="animal-card-horizontal">
                         <div class="animal-image-section">
                             {% if animal.numImages == 0 %}
-                                <img src="{{ url_for('static', filename='images/animalImages/placeholderAnimal.jpg') }}" 
+                                <img src="{{ url_for('static', filename='images/animalImages/placeholderAnimal.png') }}" 
                                      alt="{{ animal.name }}" class="animal-card-image">
                             {% else %}
                                 <img src="{{ url_for('static', filename='images/animalImages/animalImg_' + (animal.id|string) + '_0.jpg') }}" 
