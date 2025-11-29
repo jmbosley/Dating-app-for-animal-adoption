@@ -7,7 +7,7 @@ from flaskapp.models import user, animal, newsPost
 import sqlalchemy as sa
 from sqlalchemy import inspect, func
 from flaskapp.forms import (createAnimalForm, updateAccountForm, createAccountForm, deleteButton,
-                             editAnimalForm, LoginForm, createNewsPostForm, editNewsPostForm)
+                             editAnimalForm, LoginForm, createNewsPostForm, editNewsPostForm, DOG_BREEDS, CAT_BREEDS, OTHER_BREEDS)
 from PIL import Image
 from flask_login import login_user, logout_user, login_required, current_user
 from functools import wraps
@@ -184,7 +184,11 @@ def browse():
     #executes query
     animals = db.session.execute(query).scalars().all()
     
-    return render_template('browse.html', animals=animals)
+    return render_template('browse.html', 
+                     animals=animals,
+                     dog_breeds=DOG_BREEDS,
+                     cat_breeds=CAT_BREEDS,
+                     other_breeds=OTHER_BREEDS)
 
 # -------------------------------------------------------- Public Routes
 
