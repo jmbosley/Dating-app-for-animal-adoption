@@ -218,12 +218,12 @@ h1{
     background: var(--darkaccent);
     border-radius: 20px;
     height: 400px;
-    max-width: 700px;
+    max-width: 500px;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
     position: relative;
+    overflow: hidden;
 }
 
 /* About Section */

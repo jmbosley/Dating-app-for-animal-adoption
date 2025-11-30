@@ -34,23 +34,14 @@
             <h2 class="section-title">How It Works</h2>
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <img src="{{ url_for('static', filename='images/search-icon.svg') }}" alt="Browse" class="feature-icon-image" onerror="this.style.display='none'">
-                    </div>
                     <h3>Browse Profiles</h3>
                     <p>Search through pictures and profiles of animals available for adoption</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <img src="{{ url_for('static', filename='images/match-icon.svg') }}" alt="Filter" class="feature-icon-image" onerror="this.style.display='none'">
-                    </div>
                     <h3>Find Your Match</h3>
                     <p>Filter by breed, disposition, time in shelter, lifestyle compatibility, we have it all!</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <img src="{{ url_for('static', filename='images/adopt-icon.svg') }}" alt="Connect" class="feature-icon-image" onerror="this.style.display='none'">
-                    </div>
                     <h3>Adopt with Confidence</h3>
                     <p>Get all the information you need to make the perfect match. Then connect with the animal shelter to meet your new companion!</p>
                 </div>
@@ -70,8 +61,8 @@
                         <h3 class="news-title">{{ item.post.title }}</h3>
                         <p class="news-content">{{ item.post.body[:200] }}{% if item.post.body|length > 200 %}...{% endif %}</p>
                         {% if item.animal %}
-                        <a href="/animals/{{ item.animal.id }}" class="news-link">
-                            View {{ item.animal.name }}'s Profile
+                        <a href="/newsPosts/{{ item.post.id }}" class="news-link">
+                            View this News Post
                         </a>
                         {% endif %}
                     </div>
