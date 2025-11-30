@@ -252,7 +252,6 @@ table, th, td{
     padding: 20px;
     margin-left: auto;
     margin-right: auto;
-
 }
 
 thead tr{
@@ -275,6 +274,9 @@ tbody tr:nth-child(odd){
     text-align: center;
     color: var(--darkaccent);
 }
+
+ tr { page-break-inside: avoid }
+
 /* Features Section */
 .features {
     padding: 4rem 0;
