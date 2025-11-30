@@ -63,6 +63,23 @@ The content of other pages is inserted into block content.
         {% block content %}{% endblock %}
     </main>
 
+     <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Animal Adoption Dating Site. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (mobileMenu) {
+            mobileMenu.classList.toggle('show');
+        }
+    }
+    </script>
+
     <!-- CSS for flash messages -->
     <style>
         .flash-messages {
