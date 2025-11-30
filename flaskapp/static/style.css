@@ -218,7 +218,7 @@ h1{
     background: var(--darkaccent);
     border-radius: 20px;
     height: 400px;
-    max-width: 60%;
+    max-width: 500px;
     display: flex;
     align-items: center;
     justify-content: center;
