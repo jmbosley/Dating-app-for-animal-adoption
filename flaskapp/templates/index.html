@@ -60,11 +60,9 @@
                         <div class="news-date">{{ item.post.datePublished.strftime('%B %d, %Y') }}</div>
                         <h3 class="news-title">{{ item.post.title }}</h3>
                         <p class="news-content">{{ item.post.body[:200] }}{% if item.post.body|length > 200 %}...{% endif %}</p>
-                        {% if item.animal %}
                         <a href="/newsPosts/{{ item.post.id }}" class="news-link">
                             View this News Post
                         </a>
-                        {% endif %}
                     </div>
                     {% endfor %}
                 {% else %}
