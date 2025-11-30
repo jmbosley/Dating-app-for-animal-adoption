@@ -63,10 +63,29 @@
         <div class="container">
             <h2 class="section-title">Latest News + Updates</h2>
             <div id="newsContainer" class="news-grid">
-                <div class="loading">Loading news...</div>
+                {% if news_items %}
+                    {% for item in news_items %}
+                    <div class="news-item">
+                        <div class="news-date">{{ item.post.datePublished.strftime('%B %d, %Y') }}</div>
+                        <h3 class="news-title">{{ item.post.title }}</h3>
+                        <p class="news-content">{{ item.post.body[:200] }}{% if item.post.body|length > 200 %}...{% endif %}</p>
+                        {% if item.animal %}
+                        <a href="/animals/{{ item.animal.id }}" class="news-link">
+                            View {{ item.animal.name }}'s Profile
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-news">
+                        <p>Check back later</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </section>
+
+
 
     <!-- Footer -->
     <footer class="footer">
@@ -83,17 +102,5 @@
             mobileMenu.classList.toggle('show');
         }
     }
-
-    // Load news items (placeholder for now)
-    document.addEventListener('DOMContentLoaded', function() {
-        // This would normally load news from your backend
-        const newsContainer = document.getElementById('newsContainer');
-        if (newsContainer) {
-            // For now, just remove the loading message after a delay
-            setTimeout(() => {
-                newsContainer.innerHTML = '<p style="text-align: center; color: #666;">No news items at this time.</p>';
-            }, 1000);
-        }
-    });
     </script>
 {% endblock %}
