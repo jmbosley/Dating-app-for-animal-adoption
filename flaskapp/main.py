@@ -194,7 +194,24 @@ def browse():
 
 @app.route("/")
 def root():
-    return render_template("index.html", title="Animal Adoption Dating Site")
+    #get six latest news posts
+    news_query = sa.select(newsPost).order_by(newsPost.datePublished.desc()).limit(6)
+    news_posts = db.session.execute(news_query).scalars().all()
+    
+    #for each post, get associated animal if it exists
+    news_with_animals = []
+    for post in news_posts:
+        animal_obj = None
+        if post.idAnimal:
+            animal_obj = animal.query.get(post.idAnimal)
+        news_with_animals.append({
+            'post': post,
+            'animal': animal_obj
+        })
+    
+    return render_template("index.html", 
+                         title="Animal Adoption Dating Site",
+                         news_items=news_with_animals)
 
 
 
